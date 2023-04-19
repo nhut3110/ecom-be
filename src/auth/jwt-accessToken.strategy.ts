@@ -17,6 +17,7 @@ export class JwtAccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
     return {
       username: payload.username,
       name: payload.userFullName,
+      roles: payload.roles,
       // id: payload.userId,
     };
   }

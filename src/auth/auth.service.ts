@@ -10,6 +10,7 @@ import { UsersService } from 'src/models/users/users.service';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { LoginRequest } from './interfaces/login.interface';
 import { CreateUserDto } from 'src/models/users/dto/create-user.dto';
+import { Role } from 'src/common/constants/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -31,7 +32,11 @@ export class AuthService {
       );
 
       if (validatePassword)
-        return { userFullName: user.name, username: user.username };
+        return {
+          userFullName: user.name,
+          username: user.username,
+          roles: user.roles,
+        };
     }
 
     return null;
@@ -48,12 +53,14 @@ export class AuthService {
     const tokens = await this.getTokens({
       username: rest.username,
       userFullName: rest.name,
+      roles: rest.roles,
     });
 
     this.usersService.create({
       ...rest,
       password: hashedPassword,
       refreshToken: tokens.refreshToken,
+      roles: [Role.USER], //by default for now, only create normal user type
     });
 
     return tokens;
@@ -65,6 +72,7 @@ export class AuthService {
       const tokens = await this.getTokens({
         username: user.username,
         userFullName: user.userFullName,
+        roles: user.roles,
       });
 
       await this.updateRefreshToken(username, tokens.refreshToken);
@@ -96,18 +104,20 @@ export class AuthService {
     const tokens = await this.getTokens({
       userFullName: user.name,
       username: user.username,
+      roles: user.roles,
     });
     await this.updateRefreshToken(user.username, tokens.refreshToken);
 
     return tokens;
   }
 
-  async getTokens({ username, userFullName }: JwtPayload) {
+  async getTokens({ username, userFullName, roles }: JwtPayload) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
           username,
           userFullName,
+          roles,
         },
         {
           secret: process.env.SECRET_JWT_ACCESS_KEY,
@@ -118,6 +128,7 @@ export class AuthService {
         {
           username,
           userFullName,
+          roles,
         },
         {
           secret: process.env.SECRET_JWT_REFRESH_KEY,
