@@ -9,5 +9,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @MaxLength(64)
   password?: string;
 
+  picture?: string;
+
   refreshToken?: string;
 }
