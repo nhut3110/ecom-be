@@ -33,4 +33,11 @@ export class UsersController {
   update(@Param('email') email: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(email, updateUserDto);
   }
+
+  @Get(':email')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  findOne(@Param('email') email: string) {
+    return this.usersService.findOne(email);
+  }
 }
