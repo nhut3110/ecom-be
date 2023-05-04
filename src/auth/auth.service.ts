@@ -11,12 +11,14 @@ import { LoginDto } from './dto/login.dto';
 import { Tokens } from './types/token.type';
 import axios from 'axios';
 import { SocialLoginPayload } from './types/social-payload.type';
+import { AuthConfigService } from 'src/config/auth/auth-config.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private authConfigService: AuthConfigService,
   ) {}
 
   async validateUser({
@@ -39,12 +41,12 @@ export class AuthService {
 
     const accessToken = await this.getToken({
       email: user.email,
-      duration: process.env.DURATION_JWT_ACCESS,
+      duration: this.authConfigService.getJWTAccessExpiresIn(),
     });
 
     const refreshToken = await this.getToken({
       email: user.email,
-      duration: process.env.DURATION_JWT_REFRESH,
+      duration: this.authConfigService.getJWTRefreshExpiresIn(),
     });
 
     await this.updateRefreshToken(email, refreshToken);
@@ -72,12 +74,12 @@ export class AuthService {
 
     const accessToken = await this.getToken({
       email: user.email,
-      duration: process.env.DURATION_JWT_ACCESS,
+      duration: this.authConfigService.getJWTAccessExpiresIn(),
     });
 
     const refreshToken = await this.getToken({
       email: user.email,
-      duration: process.env.DURATION_JWT_REFRESH,
+      duration: this.authConfigService.getJWTRefreshExpiresIn(),
     });
 
     await this.updateRefreshToken(user.email, refreshToken);
@@ -100,13 +102,13 @@ export class AuthService {
 
   async getFacebookAccessToken(code: string): Promise<string> {
     const params = {
-      client_id: process.env.FACEBOOK_CLIENT_ID,
-      client_secret: process.env.FACEBOOK_CLIENT_SECRET,
-      redirect_uri: process.env.FACEBOOK_CALLBACK_URL,
+      client_id: this.authConfigService.getFacebookClientId(),
+      client_secret: this.authConfigService.getFacebookClientSecret(),
+      redirect_uri: this.authConfigService.getFacebookCallbackUrl(),
       code,
     };
     const { data } = await axios.get(
-      `${process.env.FACEBOOK_GRAPH_URL}/v16.0/oauth/access_token`,
+      `${this.authConfigService.getFacebookGraphUrl()}/v16.0/oauth/access_token`,
       { params },
     );
 
@@ -114,12 +116,15 @@ export class AuthService {
   }
 
   async getFacebookUserData(accessToken: string): Promise<any> {
-    const response = await axios.get(`${process.env.FACEBOOK_GRAPH_URL}/me`, {
-      params: {
-        fields: ['id', 'name', 'email', 'picture'].join(','),
-        access_token: accessToken,
+    const response = await axios.get(
+      `${this.authConfigService.getFacebookGraphUrl()}/me`,
+      {
+        params: {
+          fields: ['id', 'name', 'email', 'picture'].join(','),
+          access_token: accessToken,
+        },
       },
-    });
+    );
     const data: SocialLoginPayload = response.data;
 
     return data;
@@ -138,7 +143,7 @@ export class AuthService {
 
     const accessToken = await this.getToken({
       email: data.email,
-      duration: process.env.DURATION_FACEBOOK_ACCESS,
+      duration: this.authConfigService.getFacebookAccessExpiresIn(),
     });
 
     return Buffer.from(accessToken).toString('base64');

@@ -14,10 +14,14 @@ import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './types/token-payload.type';
 import { Tokens } from './types/token.type';
 import { Response } from 'express';
+import { AuthConfigService } from 'src/config/auth/auth-config.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly authConfigService: AuthConfigService,
+  ) {}
 
   @Post('login')
   login(@Body() loginDetail: LoginDto): Promise<Tokens> {
@@ -37,7 +41,7 @@ export class AuthController {
 
   @Get('facebook')
   async facebookLogin(@Res() res: Response) {
-    const redirectUri = `https://www.facebook.com/v16.0/dialog/oauth?client_id=${process.env.FACEBOOK_CLIENT_ID}&redirect_uri=${process.env.FACEBOOK_CALLBACK_URL}`;
+    const redirectUri = `https://www.facebook.com/v16.0/dialog/oauth?client_id=${this.authConfigService.getFacebookClientId()}&redirect_uri=${this.authConfigService.getFacebookCallbackUrl()}`;
     return res.redirect(redirectUri);
   }
 
@@ -56,7 +60,7 @@ export class AuthController {
       );
 
       return res.redirect(
-        `${process.env.HOST_FRONT_END}/auth/callback/${userAccessToken}`,
+        `${this.authConfigService.getClientHostUrl()}/auth/callback/${userAccessToken}`,
       );
     } catch (err) {
       throw new UnauthorizedException('Wrong credentials');
