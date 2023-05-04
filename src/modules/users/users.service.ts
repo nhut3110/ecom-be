@@ -41,6 +41,7 @@ export class UsersService {
         email: user.email,
         name: user.name,
         picture: user.picture,
+        refreshToken: user.refreshToken,
       };
   }
 
