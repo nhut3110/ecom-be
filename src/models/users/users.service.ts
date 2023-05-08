@@ -1,11 +1,34 @@
-import { Injectable } from '@nestjs/common';
-import { User } from './types/user.type';
+import { Inject, Injectable } from '@nestjs/common';
+import { IUser } from './interfaces/user.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { USER_REPOSITORY } from 'src/constants';
+import { User } from './entities/user.entity';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
-  private readonly usersMock: User[] = [
+  constructor(
+    @Inject(USER_REPOSITORY) private readonly userRepository: typeof User,
+  ) {}
+
+  async getUsers(): Promise<User[]> {
+    return await this.userRepository.findAll();
+  }
+
+  async createUser(user: UserDto): Promise<User> {
+    return await this.userRepository.create<User>(user);
+  }
+
+  async findOneByEmail(email: string): Promise<User> {
+    return await this.userRepository.findOne<User>({ where: { email } });
+  }
+
+  async findOneById(id: number): Promise<User> {
+    return await this.userRepository.findOne<User>({ where: { id } });
+  }
+
+  private readonly usersMock: IUser[] = [
     {
       name: 'nhut',
       email: 'nhut@gmail.com',
@@ -26,11 +49,11 @@ export class UsersService {
     await this.usersMock.push(createUserDto);
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<IUser[]> {
     return this.usersMock;
   }
 
-  async findOneWithPassword(email: string): Promise<User | undefined> {
+  async findOneWithPassword(email: string): Promise<IUser | undefined> {
     return this.usersMock.find((user) => user.email === email);
   }
 

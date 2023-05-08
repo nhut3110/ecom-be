@@ -15,6 +15,7 @@ import { JwtPayload } from './types/token-payload.type';
 import { Tokens } from './types/token.type';
 import { Response } from 'express';
 import { AuthConfigService } from 'src/config/auth/auth-config.service';
+import { UserDto } from 'src/models/users/dto/user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -65,5 +66,10 @@ export class AuthController {
     } catch (err) {
       throw new UnauthorizedException('Wrong credentials');
     }
+  }
+
+  @Post('signup')
+  async signUp(@Body() user: UserDto) {
+    return await this.authService.create(user);
   }
 }

@@ -1,7 +1,7 @@
-export type User = {
+export class UserDto {
   name: string;
   email: string;
   password: string;
-  picture: string;
+  picture?: string;
   refreshToken?: string;
-};
+}

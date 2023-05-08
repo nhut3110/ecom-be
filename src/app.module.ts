@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { configuration } from 'config/configuration';
 import { AppConfigModule } from './config/app/app-config.module';
 import { AuthConfigModule } from './config/auth/auth-config.module';
+import { DatabaseModule } from './database/database.module';
+import { DatabaseConfigModule } from './config/database/database-config.module';
 
 @Module({
   imports: [
@@ -16,8 +18,8 @@ import { AuthConfigModule } from './config/auth/auth-config.module';
     AuthModule,
     AppConfigModule,
     AuthConfigModule,
+    DatabaseModule,
+    DatabaseConfigModule,
   ],
-
-  providers: [],
 })
 export class AppModule {}

@@ -148,4 +148,22 @@ export class AuthService {
 
     return Buffer.from(accessToken).toString('base64');
   }
+
+  public async create(user) {
+    const pass = await bcrypt.hash(user.password, 10);
+
+    const newUser = await this.usersService.createUser({
+      ...user,
+      password: pass,
+    });
+
+    const { password, ...result } = newUser['dataValues'];
+
+    const accessToken = await this.getToken({
+      email: user.email,
+      duration: this.authConfigService.getJWTAccessExpiresIn(),
+    });
+
+    return { user: result, accessToken };
+  }
 }

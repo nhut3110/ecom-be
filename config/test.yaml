@@ -12,3 +12,11 @@ facebook:
   callback_url: 'http://localhost:3000/auth/facebook/callback'
   graph_url: 'https://graph.facebook.com'
   access_expire_in: '5h'
+
+database:
+  db_user: 'postgres'
+  db_password: 'postgres'
+  db_name: 'postgres_test'
+  db_host: db'
+  db_port: '5432'
+  db_dialect: 'postgres'
