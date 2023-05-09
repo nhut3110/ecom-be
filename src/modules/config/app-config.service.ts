@@ -29,10 +29,6 @@ export class AppConfigService {
     return this.configService.get<string>('facebook.client-secret');
   }
 
-  get facebookCallbackUrl(): string {
-    return this.configService.get<string>('facebook.callback-url');
-  }
-
   get facebookGraphUrl(): string {
     return this.configService.get<string>('facebook.graph-url');
   }

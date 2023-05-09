@@ -16,7 +16,6 @@ export const configValidationSchema = Joi.object({
   facebook: Joi.object({
     'client-id': Joi.number().required(),
     'client-secret': Joi.string().required(),
-    'callback-url': Joi.string().required(),
     'graph-url': Joi.string().required(),
   }),
 });

@@ -100,11 +100,14 @@ export class AuthService {
     return token;
   }
 
-  async getFacebookAccessToken(code: string): Promise<string> {
+  async getFacebookAccessToken(
+    code: string,
+    callbackUrl: string,
+  ): Promise<string> {
     const params = {
       client_id: this.appConfigService.facebookClientId,
       client_secret: this.appConfigService.facebookClientSecret,
-      redirect_uri: this.appConfigService.facebookCallbackUrl,
+      redirect_uri: callbackUrl,
       code,
     };
     const { data } = await axios.get(
@@ -146,6 +149,14 @@ export class AuthService {
       duration: this.appConfigService.jwtAccessExpiresIn,
     });
 
-    return Buffer.from(accessToken).toString('base64');
+    const refreshToken = await this.getToken({
+      email: data.email,
+      duration: this.appConfigService.jwtRefreshExpiresIn,
+    });
+
+    return {
+      refreshToken,
+      accessToken,
+    };
   }
 }
