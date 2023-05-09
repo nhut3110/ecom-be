@@ -1,0 +1,13 @@
+port: 3000
+client: http://localhost:5173
+
+jwt:
+  secret-key: hehe
+  access-token-expire-in: 5h
+  refresh-token-expire-in: 7d
+
+facebook:
+  client-id: 1213240936224087
+  client-secret: c5eb7ba9c91525de7e980e1d15786555
+  callback-url: http://localhost:3000/auth/facebook/callback
+  graph-url: https://graph.facebook.com
