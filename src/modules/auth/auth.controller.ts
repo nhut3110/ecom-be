@@ -15,6 +15,7 @@ import { JwtPayload } from './types/token-payload.type';
 import { Tokens } from './types/token.type';
 import { Response } from 'express';
 import { AppConfigService } from 'src/modules/config/app-config.service';
+import { FacebookLoginBodyDto } from './dto/facebook-body.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -39,29 +40,21 @@ export class AuthController {
     return this.authService.requestRefreshTokens(email, refreshToken);
   }
 
-  @Get('facebook')
-  async facebookLogin(@Res() res: Response) {
-    const redirectUri = `https://www.facebook.com/v16.0/dialog/oauth?client_id=${this.appConfigService.facebookClientId}&redirect_uri=${this.appConfigService.facebookCallbackUrl}`;
-    return res.redirect(redirectUri);
-  }
-
-  @Get('facebook/callback')
-  async facebookCallback(@Query('code') code: string, @Res() res) {
+  @Post('facebook')
+  async facebookCallback(@Body() body: FacebookLoginBodyDto) {
     try {
       const facebookAccessToken = await this.authService.getFacebookAccessToken(
-        code,
+        body.code,
+        body.callbackUrl,
       );
+
       const userData = await this.authService.getFacebookUserData(
         facebookAccessToken,
       );
 
-      const userAccessToken = await this.authService.getSocialUserToken(
-        userData,
-      );
+      const userTokens = await this.authService.getSocialUserToken(userData);
 
-      return res.redirect(
-        `${this.appConfigService.clientHostUrl}/auth/callback/${userAccessToken}`,
-      );
+      return userTokens;
     } catch (err) {
       throw new UnauthorizedException('Wrong credentials');
     }
