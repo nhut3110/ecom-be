@@ -3,7 +3,7 @@ client: http://localhost:5173
 
 jwt:
   secret-key: hehe
-  access-token-expire-in: 5h
+  access-token-expire-in: 10s
   refresh-token-expire-in: 7d
 
 facebook:

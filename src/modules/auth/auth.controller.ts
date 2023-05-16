@@ -36,8 +36,8 @@ export class AuthController {
 
   @Post('refresh-token')
   requestRefreshToken(@Body() req: Request & JwtPayload): Promise<Tokens> {
-    const { email, refreshToken } = req;
-    return this.authService.requestRefreshTokens(email, refreshToken);
+    const { refreshToken } = req;
+    return this.authService.requestRefreshTokens(refreshToken);
   }
 
   @Post('facebook')
@@ -53,6 +53,8 @@ export class AuthController {
       );
 
       const userTokens = await this.authService.getSocialUserToken(userData);
+      // console.log('user data: ', userData);
+      // console.log('user tokens: ', userTokens);
 
       return userTokens;
     } catch (err) {

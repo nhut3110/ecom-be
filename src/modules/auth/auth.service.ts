@@ -12,6 +12,7 @@ import { Tokens } from './types/token.type';
 import axios from 'axios';
 import { SocialLoginPayload } from './types/social-payload.type';
 import { AppConfigService } from 'src/modules/config/app-config.service';
+import jwtDecode from 'jwt-decode';
 
 @Injectable()
 export class AuthService {
@@ -49,7 +50,7 @@ export class AuthService {
       duration: this.appConfigService.jwtRefreshExpiresIn,
     });
 
-    await this.updateRefreshToken(email, refreshToken);
+    this.updateRefreshToken(email, refreshToken);
 
     return { accessToken, refreshToken };
   }
@@ -60,17 +61,15 @@ export class AuthService {
     });
   }
 
-  async requestRefreshTokens(
-    email: string,
-    requestedRefreshToken: string,
-  ): Promise<Tokens> {
-    const user = await this.usersService.findOne(email);
+  async requestRefreshTokens(requestedRefreshToken: string): Promise<Tokens> {
+    const decodedData: any = jwtDecode(requestedRefreshToken);
+    const user = await this.usersService.findOne(decodedData.email);
 
     if (!user || !user.refreshToken)
-      throw new ForbiddenException('Access Denied');
+      throw new ForbiddenException('Access Denied, user has not logged in');
 
     if (user.refreshToken != requestedRefreshToken)
-      throw new ForbiddenException('Access Denied');
+      throw new ForbiddenException('Access Denied, wrong token provided');
 
     const accessToken = await this.getToken({
       email: user.email,
@@ -82,7 +81,7 @@ export class AuthService {
       duration: this.appConfigService.jwtRefreshExpiresIn,
     });
 
-    await this.updateRefreshToken(user.email, refreshToken);
+    this.updateRefreshToken(user.email, refreshToken);
 
     return { accessToken, refreshToken };
   }
@@ -135,15 +134,6 @@ export class AuthService {
 
   async getSocialUserToken(data: SocialLoginPayload) {
     const user = await this.usersService.findOne(data.email);
-    if (!user) {
-      await this.usersService.create({
-        email: data.email,
-        password: '',
-        name: data.name,
-        picture: data.picture.data.url,
-      });
-    }
-
     const accessToken = await this.getToken({
       email: data.email,
       duration: this.appConfigService.jwtAccessExpiresIn,
@@ -153,6 +143,20 @@ export class AuthService {
       email: data.email,
       duration: this.appConfigService.jwtRefreshExpiresIn,
     });
+
+    if (!user) {
+      await this.usersService.create({
+        email: data.email,
+        password: '',
+        name: data.name,
+        picture: data.picture.data.url,
+        refreshToken: refreshToken,
+      });
+    } else {
+      await this.usersService.update(data.email, {
+        refreshToken: refreshToken,
+      });
+    }
 
     return {
       refreshToken,
