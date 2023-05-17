@@ -11,3 +11,11 @@ facebook:
   client-secret:
   callback-url:
   graph-url:
+
+postgres:
+  username:
+  password:
+  name:
+  host:
+  port:
+  dialect:

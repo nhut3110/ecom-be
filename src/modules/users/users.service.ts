@@ -1,61 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './types/user.type';
+import { InjectModel } from '@nestjs/sequelize';
+import { User } from './entities/user.entity';
+import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
-  private readonly usersMock: User[] = [
-    {
-      name: 'nhut',
-      email: 'nhut@gmail.com',
-      password: '$2a$10$rZSagaLx2NzzJhySoEgaPeBvNEH54KXRMXpctc8SssrzBCofrz0fm', //123456789
-      picture: 'https://mcdn.coolmate.me/image/October2021/meme-cheems-1.png',
-      refreshToken: '',
-    },
-    {
-      name: 'nhut',
-      email: 'admin@gmail.com',
-      password: '$2a$10$zoOlQO5KP3z/F4gN8tdVcO9N4TqsgAhYh5VSQHV6EPiQaDPUpk8FC', //123456789
-      picture: 'https://mcdn.coolmate.me/image/October2021/meme-cheems-1.png',
-      refreshToken: '',
-    },
-  ];
+  constructor(@InjectModel(User) private readonly userModel: typeof User) {}
 
-  async create(createUserDto: CreateUserDto): Promise<void> {
-    await this.usersMock.push(createUserDto);
+  async getUsers(): Promise<User[]> {
+    return await this.userModel.scope('withoutPassword').findAll();
   }
 
-  async findAll(): Promise<User[]> {
-    return this.usersMock;
+  async createUser(user: UserDto): Promise<User> {
+    const createdUser = await this.userModel.create<User>(user);
+
+    if (createdUser) return createdUser.dataValues;
+
+    return null;
   }
 
-  async findOneWithPassword(email: string): Promise<User | undefined> {
-    return this.usersMock.find((user) => user.email === email);
+  async findOneByEmail(email: string): Promise<User> {
+    const user = await this.userModel.findOne<User>({
+      where: { email: email },
+    });
+
+    if (user) return user.dataValues;
+
+    return null;
   }
 
-  async findOne(email: string): Promise<any> {
-    const user = this.usersMock.find((user) => user.email === email);
-    if (user)
-      return {
-        email: user.email,
-        name: user.name,
-        picture: user.picture,
-        refreshToken: user.refreshToken,
-      };
+  async findOneById(id: string): Promise<User> {
+    const user = await this.userModel.findOne<User>({ where: { id: id } });
+
+    if (user) return user.dataValues;
+
+    return null;
   }
 
-  async update(email: string, updateUserDto: UpdateUserDto): Promise<void> {
-    const { name, password, refreshToken } = updateUserDto;
-    const updateUserIndex = this.usersMock.findIndex(
-      (user) => user.email === email,
-    );
+  async updateById(id: string, updateData: UpdateUserDto): Promise<number> {
+    const [affectedCount] = await this.userModel.update(updateData, {
+      where: { id: id },
+    });
 
-    if (name) this.usersMock[updateUserIndex].name = name;
-    if (password) this.usersMock[updateUserIndex].password = password;
-    if (refreshToken)
-      this.usersMock[updateUserIndex].refreshToken = refreshToken;
+    return affectedCount;
+  }
 
-    return;
+  async deleteById(id: string): Promise<number> {
+    return await this.userModel.destroy({ where: { id: id } });
   }
 }
