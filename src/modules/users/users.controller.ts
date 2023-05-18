@@ -5,8 +5,9 @@ import {
   Param,
   Patch,
   Body,
-  Delete,
   Res,
+  Req,
+  ForbiddenException,
 } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common/enums';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -14,45 +15,43 @@ import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Response } from 'express';
+import { Response, Request } from 'express';
+import { getTokenFromRequest } from 'src/utils/getTokenFromRequest';
+import { decodeIdFromToken } from 'src/utils/decodeIdFromToken';
 
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @Get('all')
+  @Get()
   async getUsers(): Promise<User[]> {
     return await this.usersService.getUsers();
   }
 
-  @Get('findByEmail/:email')
+  @Get('me')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async findOneByEmail(@Param('email') email: string): Promise<User> {
-    const user = await this.usersService.findOneByEmail(email);
-    delete user.password;
+  async findOneById(@Req() req: Request): Promise<User> {
+    const id = decodeIdFromToken(getTokenFromRequest(req));
+    if (!id) throw new ForbiddenException('user not found');
 
-    return user;
-  }
-
-  @Get('me/:id')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  async findOneById(@Param('id') id: string): Promise<User> {
     const user = await this.usersService.findOneById(id);
     delete user.password;
 
     return user;
   }
 
-  @Patch('me/:id')
+  @Patch('me')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async updateById(
-    @Param('id') id: string,
     @Body() updateData: UpdateUserDto,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
+    const id = decodeIdFromToken(getTokenFromRequest(req));
+    if (!id) throw new ForbiddenException('user not found');
+
     const count = this.usersService.updateById(id, updateData);
     if (count)
       return res.status(HttpStatus.OK).json({
@@ -62,12 +61,5 @@ export class UsersController {
     return res.status(HttpStatus.BAD_REQUEST).json({
       message: 'Unable to update user',
     });
-  }
-
-  @Delete('me/:id')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  async deleteById(@Param('id') id: string) {
-    return await this.usersService.deleteById(id);
   }
 }

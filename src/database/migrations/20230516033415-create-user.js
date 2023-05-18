@@ -1,6 +1,5 @@
 'use strict';
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.query(
@@ -61,7 +60,7 @@ module.exports = {
       return Promise.all([
         queryInterface.dropTable('users'),
         queryInterface.sequelize.query(
-          'DROP TYPE IF EXISTS "enum_Users_provider";',
+          'DROP TYPE IF EXISTS "enum_users_provider";',
         ),
       ]);
     });

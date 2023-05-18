@@ -47,4 +47,16 @@ export class User extends Model<User> {
     defaultValue: 'local',
   })
   provider: string;
+
+  @Column({
+    type: DataType.DATE,
+    field: 'created_at',
+  })
+  createAt: Date;
+
+  @Column({
+    type: DataType.DATE,
+    field: 'updated_at',
+  })
+  updateAt: Date;
 }

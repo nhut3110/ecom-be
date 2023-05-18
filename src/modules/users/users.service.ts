@@ -45,8 +45,4 @@ export class UsersService {
 
     return affectedCount;
   }
-
-  async deleteById(id: string): Promise<number> {
-    return await this.userModel.destroy({ where: { id: id } });
-  }
 }
