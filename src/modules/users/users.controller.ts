@@ -2,12 +2,11 @@ import {
   Controller,
   Get,
   UseGuards,
-  Param,
   Patch,
   Body,
   Res,
   Req,
-  ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common/enums';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -16,8 +15,7 @@ import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response, Request } from 'express';
-import { getTokenFromRequest } from 'src/utils/getTokenFromRequest';
-import { decodeIdFromToken } from 'src/utils/decodeIdFromToken';
+import { JwtPayload } from '../auth/types/token-payload.type';
 
 @Controller('users')
 export class UsersController {
@@ -32,8 +30,9 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async findOneById(@Req() req: Request): Promise<User> {
-    const id = decodeIdFromToken(getTokenFromRequest(req));
-    if (!id) throw new ForbiddenException('user not found');
+    const jwtPayload: JwtPayload = req.user;
+    const id = jwtPayload.id.toString();
+    if (!id) throw new BadRequestException('user not found');
 
     const user = await this.usersService.findOneById(id);
     delete user.password;
@@ -49,8 +48,9 @@ export class UsersController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const id = decodeIdFromToken(getTokenFromRequest(req));
-    if (!id) throw new ForbiddenException('user not found');
+    const jwtPayload: JwtPayload = req.user;
+    const id = jwtPayload.id.toString();
+    if (!id) throw new BadRequestException('user not found');
 
     const count = this.usersService.updateById(id, updateData);
     if (count)

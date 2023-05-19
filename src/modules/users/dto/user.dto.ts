@@ -7,7 +7,6 @@ import {
   IsNumber,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
 
 export class UserDto {
   @IsString()
@@ -26,7 +25,6 @@ export class UserDto {
   @ApiProperty()
   email: string;
 
-  @Exclude()
   @IsNotEmpty()
   @MinLength(8)
   @MaxLength(64)
