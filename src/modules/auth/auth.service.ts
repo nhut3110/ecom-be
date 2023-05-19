@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+import axios from 'axios';
 import {
   Injectable,
   UnauthorizedException,
@@ -9,10 +10,11 @@ import { UsersService } from '../users/users.service';
 import { JwtPayload } from './types/token-payload.type';
 import { LoginDto } from './dto/login.dto';
 import { Tokens } from './types/token.type';
-import axios from 'axios';
 import { SocialLoginPayload } from './types/social-payload.type';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import jwtDecode from 'jwt-decode';
+import { User } from '../users/entities/user.entity';
+import { UserDto } from '../users/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,74 +24,73 @@ export class AuthService {
     private appConfigService: AppConfigService,
   ) {}
 
-  async validateUser({
-    email,
-    password,
-  }: LoginDto): Promise<JwtPayload | undefined> {
-    const user = await this.usersService.findOneWithPassword(email);
+  async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt(this.appConfigService.salt);
+    return await bcrypt.hash(password, salt);
+  }
 
-    if (!user) return undefined;
+  async validateUser({ email, password }: LoginDto): Promise<boolean> {
+    const user = await this.usersService.findOneByEmail(email);
+
+    if (!user) return false;
 
     const isValid = await bcrypt.compare(password, user.password);
 
-    if (isValid) return { email: user.email };
+    if (isValid) return true;
+
+    return false;
   }
 
   async login({ email, password }: LoginDto): Promise<Tokens> {
-    const user: JwtPayload = await this.validateUser({ email, password });
+    const user: boolean = await this.validateUser({ email, password });
 
     if (!user) throw new UnauthorizedException();
 
-    const accessToken = await this.getToken({
-      email: user.email,
+    const userData: User = await this.usersService.findOneByEmail(email);
+
+    const accessToken = await this.signJWTToken({
+      id: userData.id,
       duration: this.appConfigService.jwtAccessExpiresIn,
     });
 
-    const refreshToken = await this.getToken({
-      email: user.email,
+    const refreshToken = await this.signJWTToken({
+      id: userData.id,
       duration: this.appConfigService.jwtRefreshExpiresIn,
     });
-
-    this.updateRefreshToken(email, refreshToken);
 
     return { accessToken, refreshToken };
   }
 
-  private updateRefreshToken(email: string, refreshToken: string): void {
-    this.usersService.update(email, {
-      refreshToken: refreshToken,
+  async register(user: UserDto): Promise<any> {
+    const userData = await this.usersService.findOneByEmail(user.email);
+    if (!!userData) throw new ForbiddenException('User has already existed');
+
+    return await this.usersService.createUser({
+      ...user,
+      password: await this.hashPassword(user.password),
     });
   }
 
   async requestRefreshTokens(requestedRefreshToken: string): Promise<Tokens> {
     const decodedData: any = jwtDecode(requestedRefreshToken);
-    const user = await this.usersService.findOne(decodedData.email);
 
-    if (!user || !user.refreshToken)
-      throw new ForbiddenException('Access Denied, user has not logged in');
-
-    if (user.refreshToken != requestedRefreshToken)
-      throw new ForbiddenException('Access Denied, wrong token provided');
-
-    const accessToken = await this.getToken({
-      email: user.email,
+    const accessToken = await this.signJWTToken({
+      id: decodedData.id,
       duration: this.appConfigService.jwtAccessExpiresIn,
     });
 
-    const refreshToken = await this.getToken({
-      email: user.email,
+    const refreshToken = await this.signJWTToken({
+      id: decodedData.id,
       duration: this.appConfigService.jwtRefreshExpiresIn,
     });
-
-    this.updateRefreshToken(user.email, refreshToken);
 
     return { accessToken, refreshToken };
   }
 
-  async getToken({ email, duration }: JwtPayload): Promise<string> {
-    const token = await this.jwtService.sign(
+  async signJWTToken({ id, duration }: JwtPayload): Promise<string> {
+    const token = this.jwtService.sign(
       {
-        email,
+        id,
       },
       {
         expiresIn: duration,
@@ -97,6 +98,23 @@ export class AuthService {
     );
 
     return token;
+  }
+
+  async getTokens(id: string): Promise<Tokens> {
+    const accessToken = await this.signJWTToken({
+      id: id,
+      duration: this.appConfigService.jwtAccessExpiresIn,
+    });
+
+    const refreshToken = await this.signJWTToken({
+      id: id,
+      duration: this.appConfigService.jwtRefreshExpiresIn,
+    });
+
+    return {
+      refreshToken,
+      accessToken,
+    };
   }
 
   async getFacebookAccessToken(
@@ -128,39 +146,24 @@ export class AuthService {
       },
     );
     const data: SocialLoginPayload = response.data;
-
     return data;
   }
 
   async getSocialUserToken(data: SocialLoginPayload) {
-    const user = await this.usersService.findOne(data.email);
-    const accessToken = await this.getToken({
-      email: data.email,
-      duration: this.appConfigService.jwtAccessExpiresIn,
-    });
-
-    const refreshToken = await this.getToken({
-      email: data.email,
-      duration: this.appConfigService.jwtRefreshExpiresIn,
-    });
+    const user = await this.usersService.findOneByEmail(data.email);
 
     if (!user) {
-      await this.usersService.create({
+      const createdUserResponse = await this.usersService.createUser({
         email: data.email,
         password: '',
         name: data.name,
         picture: data.picture.data.url,
-        refreshToken: refreshToken,
+        provider: 'facebook',
       });
-    } else {
-      await this.usersService.update(data.email, {
-        refreshToken: refreshToken,
-      });
+
+      return this.getTokens(createdUserResponse.id);
     }
 
-    return {
-      refreshToken,
-      accessToken,
-    };
+    return this.getTokens(user.id);
   }
 }

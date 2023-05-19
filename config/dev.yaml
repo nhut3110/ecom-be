@@ -1,5 +1,6 @@
 port: 3000
 client: http://localhost:5173
+salt: 10
 
 jwt:
   secret-key: hehe
@@ -10,3 +11,11 @@ facebook:
   client-id: 1213240936224087
   client-secret: c5eb7ba9c91525de7e980e1d15786555
   graph-url: https://graph.facebook.com
+
+postgres:
+  username: 'postgres'
+  password: 'postgres'
+  name: 'database'
+  host: 'localhost'
+  port: 5432
+  dialect: 'postgres'

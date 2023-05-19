@@ -1,15 +1,18 @@
+import { IsNumber, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { MaxLength, MinLength } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
+  @IsNumber()
+  @ApiProperty()
+  shippingPoint?: number;
+
+  @IsString()
+  @ApiProperty()
   name?: string;
 
-  @MinLength(8)
-  @MaxLength(64)
-  password?: string;
-
+  @IsString()
+  @ApiProperty()
   picture?: string;
-
-  refreshToken?: string;
 }

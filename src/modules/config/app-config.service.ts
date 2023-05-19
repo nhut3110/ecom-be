@@ -9,6 +9,10 @@ export class AppConfigService {
     return this.configService.get<number>('port');
   }
 
+  get salt(): number {
+    return this.configService.get<number>('salt');
+  }
+
   get jwtSecretKey(): string {
     return this.configService.get<string>('jwt.secret-key');
   }
@@ -35,5 +39,29 @@ export class AppConfigService {
 
   get clientHostUrl(): string {
     return this.configService.get<string>('client');
+  }
+
+  get postgresUser(): string {
+    return this.configService.get<string>('postgres.username');
+  }
+
+  get postgresPassword(): string {
+    return this.configService.get<string>('postgres.password');
+  }
+
+  get postgresName(): string {
+    return this.configService.get<string>('postgres.name');
+  }
+
+  get postgresHost(): string {
+    return this.configService.get<string>('postgres.host');
+  }
+
+  get postgresPort(): number {
+    return this.configService.get<number>('postgres.post');
+  }
+
+  get postgresDialect(): any {
+    return this.configService.get<string>('postgres.dialect');
   }
 }

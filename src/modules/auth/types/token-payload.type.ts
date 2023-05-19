@@ -1,5 +1,6 @@
 export type JwtPayload = {
-  email: string;
+  id?: string;
+  email?: string;
   refreshToken?: string;
   duration?: string;
 };

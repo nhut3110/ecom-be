@@ -1,7 +1,6 @@
 import { readFileSync } from 'fs';
 import * as yaml from 'js-yaml';
 import { join } from 'path';
-import * as Joi from 'joi';
 import { configValidationSchema } from './app-config.validation';
 
 export const configuration = async (): Promise<any> => {
@@ -14,7 +13,7 @@ export const configuration = async (): Promise<any> => {
 
   const { error, value: validatedConfig } = configValidationSchema.validate(
     config,
-    { abortEarly: false },
+    { abortEarly: false, allowUnknown: true },
   );
 
   if (error) {
