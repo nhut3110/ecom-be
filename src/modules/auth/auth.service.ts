@@ -4,6 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
@@ -15,6 +16,7 @@ import { AppConfigService } from 'src/modules/config/app-config.service';
 import jwtDecode from 'jwt-decode';
 import { User } from '../users/entities/user.entity';
 import { UserDto } from '../users/dto/user.dto';
+import { AccountTypes } from 'src/constants';
 
 @Injectable()
 export class AuthService {
@@ -29,12 +31,27 @@ export class AuthService {
     return await bcrypt.hash(password, salt);
   }
 
+  async checkPassword(
+    plainPassword: string,
+    encryptedPassword: string,
+  ): Promise<boolean> {
+    return await bcrypt.compare(plainPassword, encryptedPassword);
+  }
+
+  checkSocialUser(user: User): boolean {
+    if (user.provider === AccountTypes.LOCAL) return false;
+
+    return true;
+  }
+
   async validateUser({ email, password }: LoginDto): Promise<boolean> {
     const user = await this.usersService.findOneByEmail(email);
 
     if (!user) return false;
 
-    const isValid = await bcrypt.compare(password, user.password);
+    if (this.checkSocialUser(user)) return false;
+
+    const isValid = await this.checkPassword(password, user.password);
 
     if (isValid) return true;
 
@@ -42,9 +59,9 @@ export class AuthService {
   }
 
   async login({ email, password }: LoginDto): Promise<Tokens> {
-    const user: boolean = await this.validateUser({ email, password });
+    const isUserExisted: boolean = await this.validateUser({ email, password });
 
-    if (!user) throw new UnauthorizedException();
+    if (!isUserExisted) throw new UnauthorizedException();
 
     const userData: User = await this.usersService.findOneByEmail(email);
 
@@ -155,8 +172,8 @@ export class AuthService {
     if (!user) {
       const createdUserResponse = await this.usersService.createUser({
         email: data.email,
-        password: '',
         name: data.name,
+        password: '',
         picture: data.picture.data.url,
         provider: 'facebook',
       });
@@ -165,5 +182,30 @@ export class AuthService {
     }
 
     return this.getTokens(user.id);
+  }
+
+  async changePassword(id: string, oldPassword: string, newPassword: string) {
+    if (oldPassword === newPassword)
+      throw new BadRequestException(
+        'New password should be different from old password',
+      );
+
+    const user = await this.usersService.findOneById(id);
+    if (!user) throw new UnauthorizedException('Invalid user');
+
+    if (this.checkSocialUser(user))
+      throw new UnauthorizedException('Social user cannot change password');
+
+    const isValid = await this.checkPassword(oldPassword, user.password);
+
+    if (!isValid) throw new BadRequestException('Invalid old password');
+
+    await this.usersService.updateById(id, {
+      password: await this.hashPassword(newPassword),
+    });
+
+    return {
+      message: 'Change password successfully',
+    };
   }
 }

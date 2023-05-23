@@ -1,13 +1,16 @@
 import {
   Controller,
   Get,
+  UploadedFile,
   UseGuards,
   Patch,
   Body,
   Res,
   Req,
   BadRequestException,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { HttpStatus } from '@nestjs/common/enums';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -50,7 +53,7 @@ export class UsersController {
   ) {
     const jwtPayload: JwtPayload = req.user;
     const id = jwtPayload.id.toString();
-    if (!id) throw new BadRequestException('user not found');
+    if (!id) throw new BadRequestException('User not found');
 
     const count = this.usersService.updateById(id, updateData);
     if (count)
@@ -60,6 +63,35 @@ export class UsersController {
 
     return res.status(HttpStatus.BAD_REQUEST).json({
       message: 'Unable to update user',
+    });
+  }
+
+  @Patch('me/avatar')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const jwtPayload: JwtPayload = req.user;
+    const id = jwtPayload.id.toString();
+    if (!id) throw new BadRequestException('User not found');
+
+    const avatar = await this.usersService.uploadImageToCloudinary(file);
+    const count = await this.usersService.updateById(id, {
+      picture: avatar.url,
+    });
+
+    if (count)
+      return res.status(HttpStatus.OK).json({
+        message: 'Updated avatar successfully',
+        picture: avatar.url,
+      });
+
+    return res.status(HttpStatus.BAD_REQUEST).json({
+      message: 'Unable to update avatar. Please try again',
     });
   }
 }

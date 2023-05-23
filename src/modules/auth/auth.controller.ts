@@ -1,4 +1,13 @@
-import { Controller, Body, Post, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Body,
+  Req,
+  Post,
+  Patch,
+  UnauthorizedException,
+  BadRequestException,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './types/token-payload.type';
@@ -6,6 +15,9 @@ import { Tokens } from './types/token.type';
 import { FacebookLoginBodyDto } from './dto/facebook-body.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { User } from '../users/entities/user.entity';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -27,6 +39,21 @@ export class AuthController {
       email: email,
       password: password,
     });
+  }
+
+  @Patch('password')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async changePassword(
+    @Body() passwordData: ChangePasswordDto,
+    @Req() req: Request,
+  ) {
+    const jwtPayload: JwtPayload = req['user'];
+    const id = jwtPayload.id.toString();
+    if (!id) throw new BadRequestException('User not found');
+
+    const { oldPassword, newPassword } = passwordData;
+    return this.authService.changePassword(id, oldPassword, newPassword);
   }
 
   @Post('refresh-token')

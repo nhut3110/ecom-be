@@ -64,4 +64,16 @@ export class AppConfigService {
   get postgresDialect(): any {
     return this.configService.get<string>('postgres.dialect');
   }
+
+  get cloudinaryCloudName(): string {
+    return this.configService.get<string>('cloudinary.cloud-name');
+  }
+
+  get cloudinaryApikey(): string {
+    return this.configService.get<string>('cloudinary.api-key');
+  }
+
+  get cloudinaryApiSecret(): string {
+    return this.configService.get<string>('cloudinary.api-secret');
+  }
 }
