@@ -3,6 +3,8 @@ import { AppConfigModule } from '../modules/config/app-config.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from '../modules/users/entities/user.entity';
 import { AppConfigService } from '../modules/config/app-config.service';
+import { Category } from 'src/modules/categories/entities/category.entity';
+import { Product } from 'src/modules/products/entities/product.entity';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { AppConfigService } from '../modules/config/app-config.service';
           port: appConfigService.postgresPort,
           dialect: appConfigService.postgresDialect,
           autoLoadModels: true,
-          models: [User],
+          models: [User, Category, Product],
         };
       },
       inject: [AppConfigService],
