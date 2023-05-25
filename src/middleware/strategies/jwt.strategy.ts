@@ -7,8 +7,8 @@ import { AppConfigService } from 'src/modules/config/app-config.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
-    private usersService: UsersService,
-    private appConfigService: AppConfigService,
+    private readonly usersService: UsersService,
+    appConfigService: AppConfigService,
   ) {
     super({
       secretOrKey: appConfigService.jwtSecretKey,

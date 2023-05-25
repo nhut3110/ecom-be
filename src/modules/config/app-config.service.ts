@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppConfigService {
-  constructor(private configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) {}
 
   get port(): number {
     return this.configService.get<number>('port');
@@ -69,7 +69,7 @@ export class AppConfigService {
     return this.configService.get<string>('cloudinary.cloud-name');
   }
 
-  get cloudinaryApikey(): string {
+  get cloudinaryApiKey(): string {
     return this.configService.get<string>('cloudinary.api-key');
   }
 

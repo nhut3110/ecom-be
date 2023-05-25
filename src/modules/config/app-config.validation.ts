@@ -30,7 +30,7 @@ export const configValidationSchema = Joi.object({
 
   cloudinary: Joi.object({
     'cloud-name': Joi.string().required(),
-    'api-key': Joi.string().required(),
+    'api-key': Joi.number().required(),
     'api-secret': Joi.string().required(),
   }),
 });

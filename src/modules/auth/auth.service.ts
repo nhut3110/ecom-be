@@ -21,9 +21,9 @@ import { AccountTypes } from 'src/constants';
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-    private appConfigService: AppConfigService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+    private readonly appConfigService: AppConfigService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
