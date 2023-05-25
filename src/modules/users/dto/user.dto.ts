@@ -5,6 +5,7 @@ import {
   MaxLength,
   IsEmail,
   IsNumber,
+  IsOptional,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -25,11 +26,17 @@ export class UserDto {
   @ApiProperty()
   email: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @MinLength(8)
   @MaxLength(64)
   @ApiProperty()
-  password: string;
+  password?: string;
+
+  @IsString()
+  @MinLength(8)
+  @MaxLength(20)
+  @ApiProperty()
+  phoneNumber?: string;
 
   @IsString()
   @ApiProperty()

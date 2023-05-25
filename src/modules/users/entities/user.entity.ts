@@ -31,6 +31,13 @@ export class User extends Model<User> {
   @Column({
     type: DataType.STRING,
     allowNull: true,
+    field: 'phone_number',
+  })
+  phoneNumber: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
   })
   picture: string;
 

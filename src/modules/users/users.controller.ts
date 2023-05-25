@@ -1,25 +1,29 @@
 import {
   Controller,
   Get,
+  UploadedFile,
   UseGuards,
   Patch,
   Body,
-  Res,
-  Req,
   BadRequestException,
+  UseInterceptors,
 } from '@nestjs/common';
-import { HttpStatus } from '@nestjs/common/enums';
+import { InjectModel } from '@nestjs/sequelize';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Response, Request } from 'express';
-import { JwtPayload } from '../auth/types/token-payload.type';
+import { UserData } from 'src/decorators/user-data.decorator';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    @InjectModel(User)
+    private readonly userModel: typeof User,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Get()
   async getUsers(): Promise<User[]> {
@@ -29,12 +33,10 @@ export class UsersController {
   @Get('me')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async findOneById(@Req() req: Request): Promise<User> {
-    const jwtPayload: JwtPayload = req.user;
-    const id = jwtPayload.id.toString();
-    if (!id) throw new BadRequestException('user not found');
+  async findOneById(@UserData('id') userId: string): Promise<User> {
+    if (!userId) throw new BadRequestException('user not found');
 
-    const user = await this.usersService.findOneById(id);
+    const user = await this.usersService.findOneById(userId);
     delete user.password;
 
     return user;
@@ -45,21 +47,31 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async updateById(
     @Body() updateData: UpdateUserDto,
-    @Req() req: Request,
-    @Res() res: Response,
+    @UserData('id') userId: string,
   ) {
-    const jwtPayload: JwtPayload = req.user;
-    const id = jwtPayload.id.toString();
-    if (!id) throw new BadRequestException('user not found');
+    if (!userId) throw new BadRequestException('user not found');
 
-    const count = this.usersService.updateById(id, updateData);
-    if (count)
-      return res.status(HttpStatus.OK).json({
-        message: 'Updated successfully',
-      });
-
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      message: 'Unable to update user',
+    await this.userModel.update(updateData, {
+      where: { id: userId },
     });
+  }
+
+  @Patch('me/avatar')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @UserData('id') userId: string,
+  ) {
+    if (!userId) throw new BadRequestException('user not found');
+
+    const avatar = await this.usersService.uploadImageToCloudinary(file);
+    await this.userModel.update(
+      { picture: avatar.url },
+      { where: { id: userId } },
+    );
+
+    return { picture: avatar.url };
   }
 }

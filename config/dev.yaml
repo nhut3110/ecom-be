@@ -13,9 +13,14 @@ facebook:
   graph-url: https://graph.facebook.com
 
 postgres:
-  username: 'postgres'
-  password: 'postgres'
-  name: 'database'
-  host: 'localhost'
+  username: postgres
+  password: postgres
+  name: database
+  host: localhost
   port: 5432
-  dialect: 'postgres'
+  dialect: postgres
+
+cloudinary:
+  cloud-name: dzd6xmzvv
+  api-key: 156269933569375
+  api-secret: 3f_Nhoy9S7uk_sJuUQyYBD0pGkQ
