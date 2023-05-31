@@ -6,9 +6,7 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { JwtPayload } from './types/token-payload.type';
 import { LoginDto } from './dto/login.dto';
 import { Tokens } from './types/token.type';
 import { SocialLoginPayload } from './types/social-payload.type';
@@ -18,13 +16,14 @@ import { User } from '../users/user.entity';
 import { UserDto } from '../users/dto/user.dto';
 import { AccountTypes } from 'src/constants';
 import { IResponse } from '../../constants/interfaces/response.interface';
+import { TokensService } from '../tokens/tokens.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
-    private readonly jwtService: JwtService,
-    private readonly appConfigService: AppConfigService,
+    private usersService: UsersService,
+    private appConfigService: AppConfigService,
+    private tokensService: TokensService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -66,17 +65,14 @@ export class AuthService {
 
     const userData: User = await this.usersService.findOneByEmail(email);
 
-    const accessToken = await this.signJWTToken({
-      id: userData.id,
-      duration: this.appConfigService.jwtAccessExpiresIn,
-    });
+    return this.tokensService.getTokens(userData.id);
+  }
 
-    const refreshToken = await this.signJWTToken({
-      id: userData.id,
-      duration: this.appConfigService.jwtRefreshExpiresIn,
-    });
+  async logout(id: string) {
+    const user = await this.usersService.findOneById(id);
+    if (!user) throw new Error('User not found');
 
-    return { accessToken, refreshToken };
+    return this.tokensService.revokeToken(id);
   }
 
   async register(user: UserDto): Promise<any> {
@@ -88,52 +84,6 @@ export class AuthService {
       ...user,
       password: await this.hashPassword(user.password),
     });
-  }
-
-  async requestRefreshTokens(requestedRefreshToken: string): Promise<Tokens> {
-    const decodedData: any = jwtDecode(requestedRefreshToken);
-
-    const accessToken = await this.signJWTToken({
-      id: decodedData.id,
-      duration: this.appConfigService.jwtAccessExpiresIn,
-    });
-
-    const refreshToken = await this.signJWTToken({
-      id: decodedData.id,
-      duration: this.appConfigService.jwtRefreshExpiresIn,
-    });
-
-    return { accessToken, refreshToken };
-  }
-
-  async signJWTToken({ id, duration }: JwtPayload): Promise<string> {
-    const token = this.jwtService.sign(
-      {
-        id,
-      },
-      {
-        expiresIn: duration,
-      },
-    );
-
-    return token;
-  }
-
-  async getTokens(id: string): Promise<Tokens> {
-    const accessToken = await this.signJWTToken({
-      id: id,
-      duration: this.appConfigService.jwtAccessExpiresIn,
-    });
-
-    const refreshToken = await this.signJWTToken({
-      id: id,
-      duration: this.appConfigService.jwtRefreshExpiresIn,
-    });
-
-    return {
-      refreshToken,
-      accessToken,
-    };
   }
 
   async getFacebookAccessToken(
@@ -180,10 +130,10 @@ export class AuthService {
         provider: 'facebook',
       });
 
-      return this.getTokens(createdUserResponse.id);
+      return this.tokensService.getTokens(createdUserResponse.id);
     }
 
-    return this.getTokens(user.id);
+    return this.tokensService.getTokens(user.id);
   }
 
   async changePassword(

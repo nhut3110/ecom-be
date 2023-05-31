@@ -18,10 +18,14 @@ import { User } from '../users/user.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
+import { TokensService } from '../tokens/tokens.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly tokensService: TokensService,
+  ) {}
 
   @Post('register')
   async register(@Body() user: CreateUserDto): Promise<User> {
@@ -59,7 +63,7 @@ export class AuthController {
   @Post('refresh-token')
   requestRefreshToken(@Body() req: Request & JwtPayload): Promise<Tokens> {
     const { refreshToken } = req;
-    return this.authService.requestRefreshTokens(refreshToken);
+    return this.tokensService.requestRefreshTokens(refreshToken);
   }
 
   @Post('facebook')

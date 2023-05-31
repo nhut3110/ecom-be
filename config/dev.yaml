@@ -4,8 +4,8 @@ salt: 10
 
 jwt:
   secret-key: hehe
-  access-token-expire-in: 10s
-  refresh-token-expire-in: 7d
+  access-token-expire-in: 10
+  refresh-token-expire-in: 604800
 
 facebook:
   client-id: 1213240936224087
@@ -24,3 +24,7 @@ cloudinary:
   cloud-name: dzd6xmzvv
   api-key: 156269933569375
   api-secret: 3f_Nhoy9S7uk_sJuUQyYBD0pGkQ
+
+redis:
+  host: 127.0.0.1
+  port: 6379
