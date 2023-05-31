@@ -7,6 +7,8 @@ import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ProductsModule } from './modules/products/products.module';
+import { TokensModule } from './modules/tokens/tokens.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { ProductsModule } from './modules/products/products.module';
     CloudinaryModule,
     ProductsModule,
     CategoriesModule,
+    TokensModule,
+    RedisModule,
   ],
   providers: [CloudinaryService],
 })

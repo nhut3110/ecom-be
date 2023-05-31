@@ -22,7 +22,7 @@ import { JwtPayload } from '../auth/types/token-payload.type';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Get()
   async getUsers(): Promise<User[]> {

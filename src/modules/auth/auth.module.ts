@@ -7,6 +7,10 @@ import { JwtStrategy } from 'src/middleware/strategies/jwt.strategy';
 import { AuthController } from './auth.controller';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import { AppConfigModule } from 'src/modules/config/app-config.module';
+import { TokensModule } from '../tokens/tokens.module';
+import { TokensService } from '../tokens/tokens.service';
+import { RedisModule } from 'src/redis/redis.module';
+import { RedisService } from 'src/redis/redis.service';
 
 @Module({
   controllers: [AuthController],
@@ -14,6 +18,8 @@ import { AppConfigModule } from 'src/modules/config/app-config.module';
     UsersModule,
     PassportModule,
     AppConfigModule,
+    TokensModule,
+    RedisModule,
     JwtModule.registerAsync({
       imports: [AppConfigModule],
       useFactory: (appConfigService: AppConfigService) => ({
@@ -22,7 +28,13 @@ import { AppConfigModule } from 'src/modules/config/app-config.module';
       inject: [AppConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy, AppConfigService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    AppConfigService,
+    TokensService,
+    RedisService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
