@@ -48,7 +48,7 @@ export class UsersController {
   async updateById(
     @Body() updateData: UpdateUserDto,
     @UserData('id') userId: string,
-  ) {
+  ): Promise<void> {
     if (!userId) throw new BadRequestException('user not found');
 
     await this.userModel.update(updateData, {
@@ -63,7 +63,9 @@ export class UsersController {
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @UserData('id') userId: string,
-  ) {
+  ): Promise<{
+    picture: any;
+  }> {
     if (!userId) throw new BadRequestException('user not found');
 
     const avatar = await this.usersService.uploadImageToCloudinary(file);
