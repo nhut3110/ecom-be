@@ -14,7 +14,7 @@ import { Tokens } from './types/token.type';
 import { SocialLoginPayload } from './types/social-payload.type';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import jwtDecode from 'jwt-decode';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { UserDto } from '../users/dto/user.dto';
 import { AccountTypes } from 'src/constants';
 

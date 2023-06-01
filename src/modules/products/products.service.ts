@@ -1,8 +1,9 @@
+import { InjectModel } from '@nestjs/sequelize';
 import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { InjectModel } from '@nestjs/sequelize';
-import { Product } from './entities/product.entity';
+import { Product } from './product.entity';
+import { IdDto } from '../users/dto/id.dto';
 
 @Injectable()
 export class ProductsService {
@@ -14,29 +15,23 @@ export class ProductsService {
     return await this.productModel.create(product);
   }
 
-  async createBulk(products: CreateProductDto[]) {
-    return products.map(
-      async (product: CreateProductDto) =>
-        await this.productModel.create(product),
-    );
+  async createBulk(products: CreateProductDto[]): Promise<Product[]> {
+    return this.productModel.bulkCreate(products);
   }
 
   async findAll(): Promise<Product[]> {
     return await this.productModel.findAll();
   }
 
-  async findOne(id: string): Promise<Product> {
+  async findOne(id: IdDto): Promise<Product> {
     const product = await this.productModel.findOne({ where: { id: id } });
 
     if (product) return product.dataValues;
 
-    return null;
+    throw new Error('Product not found');
   }
 
-  async update(
-    id: string,
-    updateProductDto: UpdateProductDto,
-  ): Promise<number> {
+  async update(id: IdDto, updateProductDto: UpdateProductDto): Promise<number> {
     const [affectedCount] = await this.productModel.update(updateProductDto, {
       where: { id: id },
     });
@@ -44,11 +39,7 @@ export class ProductsService {
     return affectedCount;
   }
 
-  async remove(id: string): Promise<number> {
+  async remove(id: IdDto): Promise<number> {
     return this.productModel.destroy({ where: { id: id } });
-  }
-
-  async clear() {
-    return this.productModel.destroy({ where: {} });
   }
 }

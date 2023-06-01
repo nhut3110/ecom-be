@@ -1,9 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { CategoryDto } from './category.dto';
 
-export class UpdateCategoryDto {
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  name?: string;
-}
+export class UpdateCategoryDto extends CategoryDto {}

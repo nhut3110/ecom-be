@@ -1,14 +1,9 @@
-import {
-  Column,
-  DataType,
-  ForeignKey,
-  Model,
-  Table,
-} from 'sequelize-typescript';
-import { Category } from 'src/modules/categories/entities/category.entity';
+import { Column, DataType, ForeignKey, Table } from 'sequelize-typescript';
+import { TimestampBaseModel } from 'src/constants/base-entities/timestamp.entity';
+import { Category } from 'src/modules/categories/category.entity';
 
 @Table({ tableName: 'products', timestamps: false })
-export class Product extends Model<Product> {
+export class Product extends TimestampBaseModel<Product> {
   @Column({ type: DataType.STRING, allowNull: false })
   title: string;
 
@@ -30,16 +25,4 @@ export class Product extends Model<Product> {
 
   @Column({ type: DataType.INTEGER, allowNull: true })
   count: number;
-
-  @Column({
-    type: DataType.DATE,
-    field: 'created_at',
-  })
-  createAt: Date;
-
-  @Column({
-    type: DataType.DATE,
-    field: 'updated_at',
-  })
-  updateAt: Date;
 }

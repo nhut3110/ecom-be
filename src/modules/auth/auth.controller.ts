@@ -14,7 +14,7 @@ import { JwtPayload } from './types/token-payload.type';
 import { Tokens } from './types/token.type';
 import { FacebookLoginBodyDto } from './dto/facebook-body.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';

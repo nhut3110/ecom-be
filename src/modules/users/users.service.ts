@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from './entities/user.entity';
+import { User } from './user.entity';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { CloudinaryService } from 'src/modules/cloudinary/cloudinary.service';
+import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 
 @Injectable()
 export class UsersService {
@@ -22,7 +23,7 @@ export class UsersService {
 
     if (createdUser) return createdUser.dataValues;
 
-    return null;
+    throw new Error('User creation failed');
   }
 
   async findOneByEmail(email: string): Promise<User> {
@@ -32,7 +33,7 @@ export class UsersService {
 
     if (user) return user.dataValues;
 
-    return null;
+    throw new Error('Unable to find user');
   }
 
   async findOneById(id: string): Promise<User> {
@@ -40,7 +41,7 @@ export class UsersService {
 
     if (user) return user.dataValues;
 
-    return null;
+    throw new Error('Unable to find user');
   }
 
   async updateById(id: string, updateData: UpdateUserDto): Promise<number> {
@@ -51,7 +52,9 @@ export class UsersService {
     return affectedCount;
   }
 
-  async uploadImageToCloudinary(file: Express.Multer.File) {
+  async uploadImageToCloudinary(
+    file: Express.Multer.File,
+  ): Promise<UploadApiResponse | UploadApiErrorResponse> {
     return await this.cloudinary.uploadImage(file);
   }
 }

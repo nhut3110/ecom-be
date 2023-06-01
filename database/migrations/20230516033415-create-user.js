@@ -43,18 +43,6 @@ module.exports = {
         values: ['local', 'facebook'],
         defaultValue: 'local',
       },
-      created_at: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-        field: 'created_at',
-      },
-      updated_at: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-        field: 'updated_at',
-      },
     });
   },
 

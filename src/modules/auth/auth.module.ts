@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt/dist';
 import { PassportModule } from '@nestjs/passport/dist';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
-import { JwtStrategy } from 'src/middleware/strategies/jwt.strategy';
+import { JwtStrategy } from 'src/modules/auth/strategies/jwt.strategy';
 import { AuthController } from './auth.controller';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import { AppConfigModule } from 'src/modules/config/app-config.module';

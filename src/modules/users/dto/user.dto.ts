@@ -11,10 +11,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDto {
   @IsString()
-  @ApiProperty()
-  id?: string;
-
-  @IsString()
   @IsNotEmpty()
   @ApiProperty()
   name: string;

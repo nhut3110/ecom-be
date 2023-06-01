@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
-import { Table, Column, Model, DataType, Scopes } from 'sequelize-typescript';
+import { Table, Column, DataType, Scopes } from 'sequelize-typescript';
+import { TimestampBaseModel } from 'src/constants/base-entities/timestamp.entity';
 
 @Scopes(() => ({
   withoutPassword: {
@@ -7,7 +8,7 @@ import { Table, Column, Model, DataType, Scopes } from 'sequelize-typescript';
   },
 }))
 @Table({ tableName: 'users', timestamps: false })
-export class User extends Model<User> {
+export class User extends TimestampBaseModel<User> {
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -54,16 +55,4 @@ export class User extends Model<User> {
     defaultValue: 'local',
   })
   provider: string;
-
-  @Column({
-    type: DataType.DATE,
-    field: 'created_at',
-  })
-  createAt: Date;
-
-  @Column({
-    type: DataType.DATE,
-    field: 'updated_at',
-  })
-  updateAt: Date;
 }

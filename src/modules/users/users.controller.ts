@@ -13,7 +13,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
-import { User } from './entities/user.entity';
+import { User } from './user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserData } from 'src/decorators/user-data.decorator';
 
