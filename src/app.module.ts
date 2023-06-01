@@ -9,6 +9,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { ProductsModule } from './modules/products/products.module';
 import { TokensModule } from './modules/tokens/tokens.module';
 import { RedisModule } from './redis/redis.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RedisModule } from './redis/redis.module';
     CategoriesModule,
     TokensModule,
     RedisModule,
+    MailModule,
   ],
   providers: [CloudinaryService],
 })

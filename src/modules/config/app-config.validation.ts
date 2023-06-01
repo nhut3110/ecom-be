@@ -54,4 +54,18 @@ export const configValidationSchema = Joi.object({
     port: Joi.number().required(),
     host: Joi.string().required(),
   }),
+
+  google: Joi.object({
+    'client-id': Joi.string().required(),
+    'client-secret': Joi.string().required(),
+    token: Joi.string().required(),
+    'oauth2-callback-url': Joi.string().required(),
+  }),
+
+  otp: Joi.object({
+    ttl: Joi.alternatives().try(
+      Joi.number().integer().min(0).required(),
+      timeSpanExtension.timeSpan().required(),
+    ),
+  }),
 });

@@ -1,5 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
+import OTPGenerator from 'otp-generator';
 import {
   Injectable,
   UnauthorizedException,
@@ -15,6 +16,9 @@ import { User } from '../users/entities/user.entity';
 import { UserDto } from '../users/dto/user.dto';
 import { AccountTypes } from 'src/constants';
 import { TokensService } from '../tokens/tokens.service';
+import { MailService } from 'src/mail/mail.service';
+import { RedisService } from 'src/redis/redis.service';
+import { convertTimeToSeconds } from 'src/utils/convertTimeToSeconds';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +26,8 @@ export class AuthService {
     private usersService: UsersService,
     private appConfigService: AppConfigService,
     private tokensService: TokensService,
+    private mailService: MailService,
+    private redisService: RedisService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -81,6 +87,42 @@ export class AuthService {
       ...user,
       password: await this.hashPassword(user.password),
     });
+  }
+
+  async setOTPToRedis(email: string, code: string) {
+    const existedOtp = await this.redisService.get(email);
+
+    if (existedOtp) await this.redisService.del(email);
+
+    const ttl = convertTimeToSeconds(this.appConfigService.otpTTL);
+
+    return await this.redisService.set(email, code, {
+      ttl: ttl,
+    });
+  }
+
+  async verifyOTP(email: string, code: string): Promise<boolean> {
+    const otp = await this.redisService.get(email);
+
+    if (otp !== code) return false;
+    await this.redisService.del(email);
+
+    return true;
+  }
+
+  async sendOTP(email: string) {
+    const user = await this.usersService.findOneByEmail(email);
+
+    if (user) throw new Error(`User ${email} already exists`);
+
+    const code = '123456';
+
+    const isSendOTP = await this.mailService.sendOTPMail(email, code);
+
+    if (!isSendOTP)
+      throw new Error('Something went wrong, please try again later');
+
+    return this.setOTPToRedis(email, code);
   }
 
   async getFacebookAccessToken(

@@ -11,6 +11,8 @@ import { TokensModule } from '../tokens/tokens.module';
 import { TokensService } from '../tokens/tokens.service';
 import { RedisModule } from 'src/redis/redis.module';
 import { RedisService } from 'src/redis/redis.service';
+import { MailModule } from 'src/mail/mail.module';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
   controllers: [AuthController],
@@ -20,6 +22,7 @@ import { RedisService } from 'src/redis/redis.service';
     AppConfigModule,
     TokensModule,
     RedisModule,
+    MailModule,
     JwtModule.registerAsync({
       imports: [AppConfigModule],
       useFactory: (appConfigService: AppConfigService) => ({
@@ -34,6 +37,7 @@ import { RedisService } from 'src/redis/redis.service';
     AppConfigService,
     TokensService,
     RedisService,
+    MailService,
   ],
   exports: [AuthService],
 })

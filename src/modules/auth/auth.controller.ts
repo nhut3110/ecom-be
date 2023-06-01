@@ -2,8 +2,10 @@ import {
   Controller,
   Body,
   Req,
+  Get,
   Post,
   Patch,
+  Param,
   UnauthorizedException,
   BadRequestException,
   UseGuards,
@@ -27,8 +29,27 @@ export class AuthController {
     private readonly tokensService: TokensService,
   ) {}
 
+  @Get('otp/:email')
+  async sendOTPEmail(@Param('email') email: string) {
+    console.log(email);
+    return await this.authService.sendOTP(email);
+  }
+
+  @Post('verifyOtp')
+  async verifyOTP(@Body() email: string, code: string): Promise<boolean> {
+    const isVerified = await this.authService.verifyOTP(email, code);
+
+    if (!isVerified) return false;
+
+    return true;
+  }
+
   @Post('register')
-  async register(@Body() user: CreateUserDto): Promise<User> {
+  async register(@Body() user: CreateUserDto, code: string): Promise<User> {
+    const isVerified = await this.authService.verifyOTP(user.email, code);
+
+    if (!isVerified) throw new BadRequestException('Invalid OTP code');
+
     const createdUser = await this.authService.register(user);
     delete createdUser.password;
 

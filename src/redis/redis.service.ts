@@ -1,4 +1,4 @@
-import { Cache } from 'cache-manager';
+import { Cache, CachingConfig } from 'cache-manager';
 import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import { convertTimeToSeconds } from 'src/utils/convertTimeToSeconds';
@@ -15,8 +15,8 @@ export class RedisService {
     return await this.redisService.get(key);
   }
 
-  async set(key: string, value: any) {
-    return await this.redisService.set(key, value);
+  async set(key: string, value: any, options?: CachingConfig) {
+    return await this.redisService.set(key, value, options);
   }
 
   async del(key: string) {

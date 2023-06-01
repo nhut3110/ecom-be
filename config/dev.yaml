@@ -28,3 +28,12 @@ cloudinary:
 redis:
   host: 127.0.0.1
   port: 6379
+
+google:
+  client-id: 582703940307-qgduv26gmp8ie39i759v6n48k13n40dt.apps.googleusercontent.com
+  client-secret: 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
+  token: 1//04kE-IFY7Gh52CgYIARAAGAQSNgF-L9Ir5azrdQnJnt9dnLoERXQiyVRv_JFNv0KMX12LoYCmLB-LgKdUltbpHJNY9dAZQJVS1Q
+  oauth2-callback-url: https://developers.google.com/oauthplayground
+
+otp:
+  ttl: 1800
