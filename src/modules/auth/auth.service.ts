@@ -14,9 +14,10 @@ import { Tokens } from './types/token.type';
 import { SocialLoginPayload } from './types/social-payload.type';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import jwtDecode from 'jwt-decode';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { UserDto } from '../users/dto/user.dto';
 import { AccountTypes } from 'src/constants';
+import { IResponse } from '../../constants/interfaces/response.interface';
 
 @Injectable()
 export class AuthService {
@@ -49,7 +50,7 @@ export class AuthService {
 
     if (!user) return false;
 
-    if (this.checkSocialUser(user)) return false;
+    if (this.checkSocialUser(user) && !password) return false;
 
     const isValid = await this.checkPassword(password, user.password);
 
@@ -80,6 +81,7 @@ export class AuthService {
 
   async register(user: UserDto): Promise<any> {
     const userData = await this.usersService.findOneByEmail(user.email);
+    console.log(userData);
     if (!!userData) throw new ForbiddenException('User has already existed');
 
     return await this.usersService.createUser({
@@ -166,7 +168,7 @@ export class AuthService {
     return data;
   }
 
-  async getSocialUserToken(data: SocialLoginPayload) {
+  async getSocialUserToken(data: SocialLoginPayload): Promise<Tokens> {
     const user = await this.usersService.findOneByEmail(data.email);
 
     if (!user) {
@@ -184,7 +186,11 @@ export class AuthService {
     return this.getTokens(user.id);
   }
 
-  async changePassword(id: string, oldPassword: string, newPassword: string) {
+  async changePassword(
+    id: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<IResponse> {
     if (oldPassword === newPassword)
       throw new BadRequestException(
         'New password should be different from old password',
@@ -193,12 +199,11 @@ export class AuthService {
     const user = await this.usersService.findOneById(id);
     if (!user) throw new UnauthorizedException('Invalid user');
 
-    if (this.checkSocialUser(user))
-      throw new UnauthorizedException('Social user cannot change password');
+    if (!this.checkSocialUser(user)) {
+      const isValid = await this.checkPassword(oldPassword, user.password);
 
-    const isValid = await this.checkPassword(oldPassword, user.password);
-
-    if (!isValid) throw new BadRequestException('Invalid old password');
+      if (!isValid) throw new BadRequestException('Invalid old password');
+    }
 
     await this.usersService.updateById(id, {
       password: await this.hashPassword(newPassword),

@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize/dist';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { User } from './entities/user.entity';
-import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { User } from './user.entity';
+import { CloudinaryModule } from 'src/modules/cloudinary/cloudinary.module';
 
 @Module({
   imports: [SequelizeModule.forFeature([User]), CloudinaryModule],

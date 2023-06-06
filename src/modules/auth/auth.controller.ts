@@ -14,7 +14,7 @@ import { JwtPayload } from './types/token-payload.type';
 import { Tokens } from './types/token.type';
 import { FacebookLoginBodyDto } from './dto/facebook-body.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
@@ -47,7 +47,7 @@ export class AuthController {
   async changePassword(
     @Body() passwordData: ChangePasswordDto,
     @Req() req: Request,
-  ) {
+  ): Promise<object> {
     const jwtPayload: JwtPayload = req['user'];
     const id = jwtPayload.id.toString();
     if (!id) throw new BadRequestException('User not found');
@@ -63,7 +63,7 @@ export class AuthController {
   }
 
   @Post('facebook')
-  async facebookCallback(@Body() body: FacebookLoginBodyDto) {
+  async facebookCallback(@Body() body: FacebookLoginBodyDto): Promise<Tokens> {
     try {
       const facebookAccessToken = await this.authService.getFacebookAccessToken(
         body.code,
