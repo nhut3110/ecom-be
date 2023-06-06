@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './user.entity';
 import { UserDto } from './dto/user.dto';
@@ -22,8 +26,6 @@ export class UsersService {
     const createdUser = await this.userModel.create<User>(user);
 
     if (createdUser) return createdUser.dataValues;
-
-    throw new Error('User creation failed');
   }
 
   async findOneByEmail(email: string): Promise<User> {
@@ -32,16 +34,12 @@ export class UsersService {
     });
 
     if (user) return user.dataValues;
-
-    throw new Error('Unable to find user');
   }
 
   async findOneById(id: string): Promise<User> {
     const user = await this.userModel.findOne<User>({ where: { id: id } });
 
     if (user) return user.dataValues;
-
-    throw new Error('Unable to find user');
   }
 
   async updateById(id: string, updateData: UpdateUserDto): Promise<number> {
