@@ -9,8 +9,8 @@ import { AppConfigService } from 'src/modules/config/app-config.service';
 import { AppConfigModule } from 'src/modules/config/app-config.module';
 import { TokensModule } from '../tokens/tokens.module';
 import { TokensService } from '../tokens/tokens.service';
-import { RedisModule } from 'src/redis/redis.module';
-import { RedisService } from 'src/redis/redis.service';
+import { RedisModule } from 'src/modules/redis/redis.module';
+import { RedisService } from 'src/modules/redis/redis.service';
 
 @Module({
   controllers: [AuthController],

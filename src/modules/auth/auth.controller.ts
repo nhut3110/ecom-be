@@ -19,6 +19,8 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { TokensService } from '../tokens/tokens.service';
+import { IJwtDecode } from '../tokens/interfaces/jwt-decode.interface';
+import jwtDecode from 'jwt-decode';
 
 @Controller('auth')
 export class AuthController {
@@ -45,6 +47,14 @@ export class AuthController {
     });
   }
 
+  @Post('logout')
+  async logout(@Body() req: Request & JwtPayload) {
+    const { refreshToken } = req;
+    const decodeData: IJwtDecode = jwtDecode(refreshToken);
+
+    return await this.tokensService.revokeToken(decodeData.id, refreshToken);
+  }
+
   @Patch('password')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -61,9 +71,11 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  requestRefreshToken(@Body() req: Request & JwtPayload): Promise<Tokens> {
+  async requestRefreshToken(
+    @Body() req: Request & JwtPayload,
+  ): Promise<Tokens> {
     const { refreshToken } = req;
-    return this.tokensService.requestRefreshTokens(refreshToken);
+    return await this.tokensService.requestRefreshTokens(refreshToken);
   }
 
   @Post('facebook')

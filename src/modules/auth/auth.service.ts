@@ -11,7 +11,6 @@ import { LoginDto } from './dto/login.dto';
 import { Tokens } from './types/token.type';
 import { SocialLoginPayload } from './types/social-payload.type';
 import { AppConfigService } from 'src/modules/config/app-config.service';
-import jwtDecode from 'jwt-decode';
 import { User } from '../users/user.entity';
 import { UserDto } from '../users/dto/user.dto';
 import { AccountTypes } from 'src/constants';
@@ -68,16 +67,9 @@ export class AuthService {
     return this.tokensService.getTokens(userData.id);
   }
 
-  async logout(id: string) {
-    const user = await this.usersService.findOneById(id);
-    if (!user) throw new Error('User not found');
-
-    return this.tokensService.revokeToken(id);
-  }
-
-  async register(user: UserDto): Promise<any> {
+  async register(user: UserDto): Promise<User> {
     const userData = await this.usersService.findOneByEmail(user.email);
-    console.log(userData);
+
     if (!!userData) throw new ForbiddenException('User has already existed');
 
     return await this.usersService.createUser({
@@ -133,7 +125,7 @@ export class AuthService {
       return this.tokensService.getTokens(createdUserResponse.id);
     }
 
-    return this.tokensService.getTokens(user.id);
+    return await this.tokensService.getTokens(user.id);
   }
 
   async changePassword(

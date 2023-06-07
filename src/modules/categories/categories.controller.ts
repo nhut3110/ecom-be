@@ -49,7 +49,6 @@ export class CategoriesController {
 
   @Delete(':id')
   remove(@Param('id') id: IdDto): Promise<number> {
-    console.log(id);
     return this.categoriesService.remove(id);
   }
 }

@@ -4,8 +4,8 @@ salt: 10
 
 jwt:
   secret-key: hehe
-  access-token-expire-in: 10
-  refresh-token-expire-in: 604800
+  access-token-expire-in: 10s
+  refresh-token-expire-in: 3d
 
 facebook:
   client-id: 1213240936224087

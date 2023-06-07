@@ -5,9 +5,9 @@ import { PassportModule } from '@nestjs/passport';
 import { AppConfigModule } from '../config/app-config.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AppConfigService } from '../config/app-config.service';
-import { JwtStrategy } from 'src/middleware/strategies/jwt.strategy';
-import { RedisModule } from 'src/redis/redis.module';
-import { RedisService } from 'src/redis/redis.service';
+import { RedisModule } from 'src/modules/redis/redis.module';
+import { RedisService } from 'src/modules/redis/redis.service';
+import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 
 @Module({
   imports: [

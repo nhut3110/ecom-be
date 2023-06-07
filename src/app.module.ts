@@ -12,7 +12,7 @@ import { User } from './modules/users/user.entity';
 import { Category } from './modules/categories/category.entity';
 import { Product } from './modules/products/product.entity';
 import { TokensModule } from './modules/tokens/tokens.module';
-import { RedisModule } from './redis/redis.module';
+import { RedisModule } from './modules/redis/redis.module';
 
 @Module({
   imports: [

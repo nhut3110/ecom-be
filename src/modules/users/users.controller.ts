@@ -64,7 +64,7 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
     @UserData('id') userId: string,
   ): Promise<{
-    picture: any;
+    picture: string;
   }> {
     if (!userId) throw new BadRequestException('user not found');
 
