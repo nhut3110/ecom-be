@@ -52,7 +52,10 @@ export class AuthController {
     const { refreshToken } = req;
     const decodeData: IJwtDecode = jwtDecode(refreshToken);
 
-    return await this.tokensService.revokeToken(decodeData.id, refreshToken);
+    return await this.tokensService.validateAndRemovePair(
+      decodeData.id,
+      refreshToken,
+    );
   }
 
   @Patch('password')

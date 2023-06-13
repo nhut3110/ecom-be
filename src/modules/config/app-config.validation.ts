@@ -3,13 +3,10 @@ import * as Joi from 'joi';
 const timeSpanExtension = Joi.extend((joi) => ({
   type: 'timeSpan',
   base: joi.string(),
-  messages: {
-    'timeSpan.invalidFormat': 'Invalid time span format',
-  },
   validate(value, helpers) {
     const pattern = /^([0-9]+)(s|m|h|d)$/;
     if (!pattern.test(value)) {
-      return { value, errors: helpers.error('timeSpan.invalidFormat') };
+      return { value, errors: helpers.error('Invalid time span format') };
     }
   },
 }));

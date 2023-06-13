@@ -1,5 +1,5 @@
-import ms from 'ms';
+import ms, { StringValue } from 'ms';
 
-export function convertTimeToSeconds(time: string): number {
-  return Math.floor(ms(time.toString()) / 1000);
+export function convertTimeToSeconds(time: StringValue): number {
+  return Math.floor(ms(time) / 1000);
 }

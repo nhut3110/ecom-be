@@ -7,3 +7,5 @@ export const enum JwtTokenTypes {
   REFRESH = 'refresh',
   ACCESS = 'access',
 }
+
+export const tokenPrefix = 'tokens:';

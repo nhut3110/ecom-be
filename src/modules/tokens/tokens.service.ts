@@ -6,9 +6,9 @@ import { AppConfigService } from 'src/modules/config/app-config.service';
 import { JwtPayload } from '../auth/types/token-payload.type';
 import { Tokens } from '../auth/types/token.type';
 import { convertTimeToSeconds } from 'src/utils/convertTimeToSeconds';
-import { ITokens } from './interfaces/tokens.interface';
 import { IJwtDecode } from './interfaces/jwt-decode.interface';
-import { JwtTokenTypes } from 'src/constants';
+import { tokenPrefix } from 'src/constants';
+import { StringValue } from 'ms';
 
 @Injectable()
 export class TokensService {
@@ -23,58 +23,45 @@ export class TokensService {
     accessToken: string,
     refreshToken: string,
   ) {
-    const tokenPair: ITokens = {
-      accessToken,
-      refreshToken,
-    };
-    const existingTokens = (await this.redisService.get(userId)) as string;
-    const tokenList = existingTokens ? JSON.parse(existingTokens) : [];
-    tokenList.push(tokenPair);
-    const ttl = convertTimeToSeconds(this.appConfigService.jwtRefreshExpiresIn);
-    const tokenValue = JSON.stringify(tokenList);
+    const key = tokenPrefix + userId;
+    const tokenPair = accessToken + ':' + refreshToken;
+    const expirationTime =
+      convertTimeToSeconds(
+        this.appConfigService.jwtRefreshExpiresIn as StringValue,
+      ) + Math.floor(Date.now() / 1000);
 
-    return await this.redisService.set(userId, tokenValue, { ttl: ttl });
+    await this.deleteExpiredPairs(userId);
+
+    return await this.redisService.zAdd(key, expirationTime, tokenPair);
   }
 
-  async getTokenPairs(userId: string) {
-    const tokenList = (await this.redisService.get(userId)) as string;
-    return tokenList ? JSON.parse(tokenList) : [];
+  async deleteExpiredPairs(userId: string): Promise<number> {
+    const key = tokenPrefix + userId;
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    return await this.redisService.zRemRangeByScore(key, '-inf', currentTime);
   }
 
-  async revokeToken(userId: string, refreshToken: string) {
-    const tokenList = (await this.redisService.get(userId)) as string;
-    if (tokenList) {
-      const parsedTokenList = JSON.parse(tokenList);
-      const updatedTokenList = parsedTokenList.filter(
-        (tokenPair: any) => tokenPair.refreshToken !== refreshToken,
-      );
+  async getTokenPairsByUserId(userId: string): Promise<string[]> {
+    const key = tokenPrefix + userId;
+    await this.deleteExpiredPairs(userId);
 
-      return await this.redisService.set(
-        userId,
-        JSON.stringify(updatedTokenList),
-      );
-    }
-
-    return null;
+    return await this.redisService.zRange(key, 0, -1);
   }
 
-  async isTokenValid(
-    userId: string,
-    token: string,
-    tokenType: JwtTokenTypes,
-  ): Promise<boolean> {
-    const tokenList = (await this.redisService.get(userId)) as string;
+  async revokePair(userId: string, pair: string) {
+    const key = tokenPrefix + userId;
+    return await this.redisService.zRem(key, pair);
+  }
 
-    if (tokenList) {
-      const parsedTokenList = JSON.parse(tokenList);
+  async validateAndRemovePair(userId: string, token: string): Promise<boolean> {
+    const tokenPairs = await this.getTokenPairsByUserId(userId);
 
-      return await parsedTokenList.some((tokenPair: ITokens) => {
-        if (tokenType === JwtTokenTypes.ACCESS) {
-          return tokenPair.accessToken === token;
-        } else if (tokenType === JwtTokenTypes.REFRESH) {
-          return tokenPair.refreshToken === token;
-        }
-      });
+    for (const tokenPair of tokenPairs) {
+      if (tokenPair.includes(token)) {
+        await this.revokePair(userId, tokenPair);
+        return true;
+      }
     }
 
     return false;
@@ -83,17 +70,13 @@ export class TokensService {
   async requestRefreshTokens(requestedRefreshToken: string): Promise<Tokens> {
     const decodedData: IJwtDecode = jwtDecode(requestedRefreshToken);
     const { id } = decodedData;
-
-    const isValidToken = await this.isTokenValid(
+    const isValidToken = await this.validateAndRemovePair(
       id,
       requestedRefreshToken,
-      JwtTokenTypes.REFRESH,
     );
     if (!isValidToken) throw new UnauthorizedException('Invalid token');
 
-    await this.revokeToken(id, requestedRefreshToken);
-
-    return await this.getTokens(decodedData.id);
+    return await this.getTokens(id);
   }
 
   async signJWTToken({ id, duration }: JwtPayload): Promise<string> {
