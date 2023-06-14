@@ -6,7 +6,7 @@ module.exports = {
     await queryInterface.sequelize.query(
       'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
     );
-    await queryInterface.createTable('categories', {
+    await queryInterface.createTable('favorites', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -14,17 +14,33 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      name: {
-        type: Sequelize.STRING,
+      user_id: {
+        type: Sequelize.UUID,
         allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-      created_at: {
+      product_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'products',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         field: 'created_at',
       },
-      updated_at: {
+      updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
@@ -33,9 +49,9 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface) => {
+  async down(queryInterface) {
     return queryInterface.sequelize.transaction(() => {
-      return Promise.all([queryInterface.dropTable('categories')]);
+      return Promise.all([queryInterface.dropTable('favorites')]);
     });
   },
 };

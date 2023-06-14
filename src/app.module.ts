@@ -13,6 +13,8 @@ import { Category } from './modules/categories/category.entity';
 import { Product } from './modules/products/product.entity';
 import { TokensModule } from './modules/tokens/tokens.module';
 import { RedisModule } from './modules/redis/redis.module';
+import { FavoritesModule } from './modules/favorites/favorites.module';
+import { Favorite } from './modules/favorites/favorite.entity';
 
 @Module({
   imports: [
@@ -33,13 +35,14 @@ import { RedisModule } from './modules/redis/redis.module';
           port: appConfigService.postgresPort,
           dialect: appConfigService.postgresDialect,
           autoLoadModels: true,
-          models: [User, Category, Product],
+          models: [User, Category, Product, Favorite],
         };
       },
       inject: [AppConfigService],
     }),
     TokensModule,
     RedisModule,
+    FavoritesModule,
   ],
   providers: [CloudinaryService],
 })

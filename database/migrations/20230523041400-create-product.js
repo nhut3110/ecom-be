@@ -66,12 +66,7 @@ module.exports = {
 
   down: async (queryInterface) => {
     return queryInterface.sequelize.transaction(() => {
-      return Promise.all([
-        queryInterface.dropTable('products'),
-        queryInterface.sequelize.query(
-          'DROP TYPE IF EXISTS "enum_users_provider";',
-        ),
-      ]);
+      return Promise.all([queryInterface.dropTable('products')]);
     });
   },
 };
