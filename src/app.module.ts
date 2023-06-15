@@ -18,6 +18,9 @@ import { Favorite } from './modules/favorites/favorite.entity';
 import { CartModule } from './modules/carts/carts.module';
 import { Cart } from './modules/carts/cart.entity';
 import { AddressModule } from './modules/addresses/addresses.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { Order } from './modules/orders/order.entity';
+import { Address } from './modules/addresses/address.entity';
 
 @Module({
   imports: [
@@ -38,7 +41,7 @@ import { AddressModule } from './modules/addresses/addresses.module';
           port: appConfigService.postgresPort,
           dialect: appConfigService.postgresDialect,
           autoLoadModels: true,
-          models: [User, Category, Product, Favorite, Cart],
+          models: [User, Category, Product, Favorite, Cart, Order, Address],
         };
       },
       inject: [AppConfigService],
@@ -48,6 +51,7 @@ import { AddressModule } from './modules/addresses/addresses.module';
     FavoriteModule,
     CartModule,
     AddressModule,
+    OrdersModule,
   ],
   providers: [CloudinaryService],
 })
