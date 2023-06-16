@@ -7,15 +7,14 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
+import { TokensService } from '../tokens/tokens.service';
 import { LoginDto } from './dto/login.dto';
 import { Tokens } from './types/token.type';
 import { SocialLoginPayload } from './types/social-payload.type';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import { User } from '../users/user.entity';
 import { UserDto } from '../users/dto/user.dto';
-import { AccountTypes } from 'src/constants';
-import { IResponse } from '../../constants/interfaces/response.interface';
-import { TokensService } from '../tokens/tokens.service';
+import { AccountTypes, IResponse } from 'src/constants';
 
 @Injectable()
 export class AuthService {

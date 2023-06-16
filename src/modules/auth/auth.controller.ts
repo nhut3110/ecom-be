@@ -21,7 +21,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { TokensService } from '../tokens/tokens.service';
 import { UserData } from 'src/decorators/user-data.decorator';
-import { IResponse } from 'src/constants/interfaces/response.interface';
+import { IResponse } from 'src/constants';
 
 @Controller('auth')
 export class AuthController {
