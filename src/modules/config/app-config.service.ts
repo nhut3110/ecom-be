@@ -76,4 +76,16 @@ export class AppConfigService {
   get cloudinaryApiSecret(): string {
     return this.configService.get<string>('cloudinary.api-secret');
   }
+
+  get redisPort(): number {
+    return this.configService.get<number>('redis.port');
+  }
+
+  get redisHost(): string {
+    return this.configService.get<string>('redis.host');
+  }
+
+  get redisUrl(): string {
+    return this.configService.get<string>('redis.url');
+  }
 }

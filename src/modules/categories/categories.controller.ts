@@ -43,13 +43,12 @@ export class CategoriesController {
   update(
     @Param('id') id: IdDto,
     @Body() updateCategoryDto: UpdateCategoryDto,
-  ): Promise<number> {
+  ): Promise<Category> {
     return this.categoriesService.update(id, updateCategoryDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: IdDto): Promise<number> {
-    console.log(id);
     return this.categoriesService.remove(id);
   }
 }

@@ -11,6 +11,8 @@ import { AppConfigService } from './modules/config/app-config.service';
 import { User } from './modules/users/user.entity';
 import { Category } from './modules/categories/category.entity';
 import { Product } from './modules/products/product.entity';
+import { TokensModule } from './modules/tokens/tokens.module';
+import { RedisModule } from './modules/redis/redis.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { Product } from './modules/products/product.entity';
       },
       inject: [AppConfigService],
     }),
+    TokensModule,
+    RedisModule,
   ],
   providers: [CloudinaryService],
 })

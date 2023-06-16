@@ -1,8 +1,19 @@
 import * as Joi from 'joi';
+import ms, { StringValue } from 'ms';
 
-const jwtExpireTimeSchema = Joi.string()
-  .regex(/^([0-9]+)(s|m|h|d)$/)
-  .required();
+const timeSpanExtension = Joi.extend((joi) => ({
+  type: 'timeSpan',
+  base: joi.string(),
+  messages: {
+    'timeSpan.invalidFormat': 'Invalid time span format',
+  },
+  validate(value, helpers) {
+    const testResult = ms(value as StringValue);
+    if (!testResult) {
+      return { value, errors: helpers.error('timeSpan.invalidFormat') };
+    }
+  },
+}));
 
 export const configValidationSchema = Joi.object({
   NODE_ENV: Joi.string().valid('dev', 'prod', 'test').default('dev'),
@@ -11,8 +22,8 @@ export const configValidationSchema = Joi.object({
   salt: Joi.number().required(),
   jwt: Joi.object({
     'secret-key': Joi.string().required(),
-    'access-token-expire-in': jwtExpireTimeSchema,
-    'refresh-token-expire-in': jwtExpireTimeSchema,
+    'access-token-expire-in': timeSpanExtension.timeSpan().required(),
+    'refresh-token-expire-in': timeSpanExtension.timeSpan().required(),
   }),
   facebook: Joi.object({
     'client-id': Joi.number().required(),
@@ -32,5 +43,11 @@ export const configValidationSchema = Joi.object({
     'cloud-name': Joi.string().required(),
     'api-key': Joi.number().required(),
     'api-secret': Joi.string().required(),
+  }),
+
+  redis: Joi.object({
+    port: Joi.number().required(),
+    host: Joi.string().required(),
+    url: Joi.string().required(),
   }),
 });

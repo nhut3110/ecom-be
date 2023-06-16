@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   UseGuards,
+  Headers,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -18,10 +19,16 @@ import { User } from '../users/user.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
+import { TokensService } from '../tokens/tokens.service';
+import { UserData } from 'src/decorators/user-data.decorator';
+import { IResponse } from 'src/constants/interfaces/response.interface';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly tokensService: TokensService,
+  ) {}
 
   @Post('register')
   async register(@Body() user: CreateUserDto): Promise<User> {
@@ -32,22 +39,33 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() loginDetail: LoginDto): Promise<Tokens> {
+  login(@Body() loginDetail: LoginDto): Promise<Tokens> {
     const { email, password } = loginDetail;
 
-    return await this.authService.login({
+    return this.authService.login({
       email: email,
       password: password,
     });
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout(
+    @Headers('Authorization') token: string,
+    @UserData('id') userId: string,
+  ): Promise<boolean> {
+    const accessToken = token.split(' ')[1];
+
+    return this.tokensService.validateAndRemovePair(userId, accessToken, true);
+  }
+
   @Patch('password')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async changePassword(
+  changePassword(
     @Body() passwordData: ChangePasswordDto,
     @Req() req: Request,
-  ): Promise<object> {
+  ): Promise<IResponse> {
     const jwtPayload: JwtPayload = req['user'];
     const id = jwtPayload.id.toString();
     if (!id) throw new BadRequestException('User not found');
@@ -59,7 +77,7 @@ export class AuthController {
   @Post('refresh-token')
   requestRefreshToken(@Body() req: Request & JwtPayload): Promise<Tokens> {
     const { refreshToken } = req;
-    return this.authService.requestRefreshTokens(refreshToken);
+    return this.tokensService.requestRefreshTokens(refreshToken);
   }
 
   @Post('facebook')

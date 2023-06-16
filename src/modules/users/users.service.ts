@@ -18,8 +18,8 @@ export class UsersService {
     private readonly cloudinary: CloudinaryService,
   ) {}
 
-  async getUsers(): Promise<User[]> {
-    return await this.userModel.scope('withoutPassword').findAll();
+  getUsers(): Promise<User[]> {
+    return this.userModel.scope('withoutPassword').findAll();
   }
 
   async createUser(user: UserDto): Promise<User> {
@@ -42,12 +42,14 @@ export class UsersService {
     if (user) return user.dataValues;
   }
 
-  async updateById(id: string, updateData: UpdateUserDto): Promise<number> {
-    const [affectedCount] = await this.userModel.update(updateData, {
+  async updateById(id: string, updateData: UpdateUserDto): Promise<User> {
+    await this.userModel.update(updateData, {
       where: { id: id },
     });
 
-    return affectedCount;
+    return await this.userModel.findOne({
+      where: { id: id },
+    });
   }
 
   async uploadImageToCloudinary(

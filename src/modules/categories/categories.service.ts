@@ -11,16 +11,16 @@ export class CategoriesService {
     @InjectModel(Category) private readonly categoryModel: typeof Category,
   ) {}
 
-  async create(category: CreateCategoryDto): Promise<Category> {
-    return await this.categoryModel.create(category);
+  create(category: CreateCategoryDto): Promise<Category> {
+    return this.categoryModel.create(category);
   }
 
-  async createBulk(categories: CreateCategoryDto[]): Promise<Category[]> {
-    return await this.categoryModel.bulkCreate(categories);
+  createBulk(categories: CreateCategoryDto[]): Promise<Category[]> {
+    return this.categoryModel.bulkCreate(categories);
   }
 
-  async findAll(): Promise<Category[]> {
-    return await this.categoryModel.findAll();
+  findAll(): Promise<Category[]> {
+    return this.categoryModel.findAll();
   }
 
   async findOne(id: IdDto): Promise<Category> {
@@ -34,15 +34,15 @@ export class CategoriesService {
   async update(
     id: IdDto,
     updateCategoryDto: UpdateCategoryDto,
-  ): Promise<number> {
-    const [affectedCount] = await this.categoryModel.update(updateCategoryDto, {
+  ): Promise<Category> {
+    await this.categoryModel.update(updateCategoryDto, {
       where: { id: id },
     });
 
-    return affectedCount;
+    return this.categoryModel.findOne({ where: { id: id } });
   }
 
-  async remove(id: IdDto): Promise<number> {
+  remove(id: IdDto): Promise<number> {
     return this.categoryModel.destroy({ where: { id: id } });
   }
 }
