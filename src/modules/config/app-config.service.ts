@@ -84,4 +84,8 @@ export class AppConfigService {
   get redisHost(): string {
     return this.configService.get<string>('redis.host');
   }
+
+  get redisUrl(): string {
+    return this.configService.get<string>('redis.url');
+  }
 }

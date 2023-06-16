@@ -1,12 +1,16 @@
 import * as Joi from 'joi';
+import ms, { StringValue } from 'ms';
 
 const timeSpanExtension = Joi.extend((joi) => ({
   type: 'timeSpan',
   base: joi.string(),
+  messages: {
+    'timeSpan.invalidFormat': 'Invalid time span format',
+  },
   validate(value, helpers) {
-    const pattern = /^([0-9]+)(s|m|h|d)$/;
-    if (!pattern.test(value)) {
-      return { value, errors: helpers.error('Invalid time span format') };
+    const testResult = ms(value as StringValue);
+    if (!testResult) {
+      return { value, errors: helpers.error('timeSpan.invalidFormat') };
     }
   },
 }));
@@ -18,14 +22,8 @@ export const configValidationSchema = Joi.object({
   salt: Joi.number().required(),
   jwt: Joi.object({
     'secret-key': Joi.string().required(),
-    'access-token-expire-in': Joi.alternatives().try(
-      Joi.number().integer().min(0).required(),
-      timeSpanExtension.timeSpan().required(),
-    ),
-    'refresh-token-expire-in': Joi.alternatives().try(
-      Joi.number().integer().min(0).required(),
-      timeSpanExtension.timeSpan().required(),
-    ),
+    'access-token-expire-in': timeSpanExtension.timeSpan().required(),
+    'refresh-token-expire-in': timeSpanExtension.timeSpan().required(),
   }),
   facebook: Joi.object({
     'client-id': Joi.number().required(),
@@ -50,5 +48,6 @@ export const configValidationSchema = Joi.object({
   redis: Joi.object({
     port: Joi.number().required(),
     host: Joi.string().required(),
+    url: Joi.string().required(),
   }),
 });

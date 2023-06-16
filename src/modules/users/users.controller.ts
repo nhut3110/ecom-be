@@ -26,8 +26,8 @@ export class UsersController {
   ) {}
 
   @Get()
-  async getUsers(): Promise<User[]> {
-    return await this.usersService.getUsers();
+  getUsers(): Promise<User[]> {
+    return this.usersService.getUsers();
   }
 
   @Get('me')
@@ -45,15 +45,11 @@ export class UsersController {
   @Patch('me')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async updateById(
+  updateById(
     @Body() updateData: UpdateUserDto,
     @UserData('id') userId: string,
-  ): Promise<void> {
-    if (!userId) throw new BadRequestException('user not found');
-
-    await this.userModel.update(updateData, {
-      where: { id: userId },
-    });
+  ): Promise<User> {
+    return this.usersService.updateById(userId, updateData);
   }
 
   @Patch('me/avatar')

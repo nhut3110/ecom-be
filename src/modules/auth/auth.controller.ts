@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   UseGuards,
+  Headers,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -19,8 +20,8 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { TokensService } from '../tokens/tokens.service';
-import { IJwtDecode } from '../tokens/interfaces/jwt-decode.interface';
-import jwtDecode from 'jwt-decode';
+import { UserData } from 'src/decorators/user-data.decorator';
+import { IResponse } from 'src/constants/interfaces/response.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -38,33 +39,33 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() loginDetail: LoginDto): Promise<Tokens> {
+  login(@Body() loginDetail: LoginDto): Promise<Tokens> {
     const { email, password } = loginDetail;
 
-    return await this.authService.login({
+    return this.authService.login({
       email: email,
       password: password,
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@Body() req: Request & JwtPayload) {
-    const { refreshToken } = req;
-    const decodeData: IJwtDecode = jwtDecode(refreshToken);
+  logout(
+    @Headers('Authorization') token: string,
+    @UserData('id') userId: string,
+  ): Promise<boolean> {
+    const accessToken = token.split(' ')[1];
 
-    return await this.tokensService.validateAndRemovePair(
-      decodeData.id,
-      refreshToken,
-    );
+    return this.tokensService.validateAndRemovePair(userId, accessToken, true);
   }
 
   @Patch('password')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async changePassword(
+  changePassword(
     @Body() passwordData: ChangePasswordDto,
     @Req() req: Request,
-  ): Promise<object> {
+  ): Promise<IResponse> {
     const jwtPayload: JwtPayload = req['user'];
     const id = jwtPayload.id.toString();
     if (!id) throw new BadRequestException('User not found');
@@ -74,11 +75,9 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  async requestRefreshToken(
-    @Body() req: Request & JwtPayload,
-  ): Promise<Tokens> {
+  requestRefreshToken(@Body() req: Request & JwtPayload): Promise<Tokens> {
     const { refreshToken } = req;
-    return await this.tokensService.requestRefreshTokens(refreshToken);
+    return this.tokensService.requestRefreshTokens(refreshToken);
   }
 
   @Post('facebook')

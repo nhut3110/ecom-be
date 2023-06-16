@@ -1,13 +1,13 @@
 import jwtDecode from 'jwt-decode';
+import ms from 'ms';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { RedisService } from 'src/modules/redis/redis.service';
 import { JwtService } from '@nestjs/jwt';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import { JwtPayload } from '../auth/types/token-payload.type';
 import { Tokens } from '../auth/types/token.type';
-import { convertTimeToSeconds } from 'src/utils/convertTimeToSeconds';
 import { IJwtDecode } from './interfaces/jwt-decode.interface';
-import { tokenPrefix } from 'src/constants';
+import { TOKEN_PREFIX } from 'src/constants';
 import { StringValue } from 'ms';
 
 @Injectable()
@@ -23,45 +23,50 @@ export class TokensService {
     accessToken: string,
     refreshToken: string,
   ) {
-    const key = tokenPrefix + userId;
+    const key = TOKEN_PREFIX + ':' + userId;
     const tokenPair = accessToken + ':' + refreshToken;
     const expirationTime =
-      convertTimeToSeconds(
-        this.appConfigService.jwtRefreshExpiresIn as StringValue,
-      ) + Math.floor(Date.now() / 1000);
+      ms(this.appConfigService.jwtRefreshExpiresIn as StringValue) +
+      Math.floor(Date.now());
 
     await this.deleteExpiredPairs(userId);
 
     return await this.redisService.zAdd(key, expirationTime, tokenPair);
   }
 
-  async deleteExpiredPairs(userId: string): Promise<number> {
-    const key = tokenPrefix + userId;
-    const currentTime = Math.floor(Date.now() / 1000);
+  deleteExpiredPairs(userId: string): Promise<number> {
+    const key = TOKEN_PREFIX + ':' + userId;
+    const currentTime = Math.floor(Date.now());
 
-    return await this.redisService.zRemRangeByScore(key, '-inf', currentTime);
+    return this.redisService.zRemRangeByScore(key, '-inf', currentTime);
   }
 
   async getTokenPairsByUserId(userId: string): Promise<string[]> {
-    const key = tokenPrefix + userId;
+    const key = TOKEN_PREFIX + ':' + userId;
     await this.deleteExpiredPairs(userId);
 
     return await this.redisService.zRange(key, 0, -1);
   }
 
-  async revokePair(userId: string, pair: string) {
-    const key = tokenPrefix + userId;
-    return await this.redisService.zRem(key, pair);
+  revokePair(userId: string, pair: string) {
+    const key = TOKEN_PREFIX + ':' + userId;
+    return this.redisService.zRem(key, pair);
   }
 
-  async validateAndRemovePair(userId: string, token: string): Promise<boolean> {
+  async validateAndRemovePair(
+    userId: string,
+    token: string,
+    isRemoved?: boolean,
+  ): Promise<boolean> {
     const tokenPairs = await this.getTokenPairsByUserId(userId);
 
-    for (const tokenPair of tokenPairs) {
-      if (tokenPair.includes(token)) {
-        await this.revokePair(userId, tokenPair);
-        return true;
-      }
+    const foundTokenPair = tokenPairs.find((tokenPair) =>
+      tokenPair.includes(token),
+    );
+
+    if (foundTokenPair) {
+      isRemoved && (await this.revokePair(userId, foundTokenPair));
+      return true;
     }
 
     return false;
@@ -73,13 +78,14 @@ export class TokensService {
     const isValidToken = await this.validateAndRemovePair(
       id,
       requestedRefreshToken,
+      true,
     );
     if (!isValidToken) throw new UnauthorizedException('Invalid token');
 
     return await this.getTokens(id);
   }
 
-  async signJWTToken({ id, duration }: JwtPayload): Promise<string> {
+  signJWTToken({ id, duration }: JwtPayload): string {
     const token = this.jwtService.sign(
       {
         id,
@@ -93,12 +99,12 @@ export class TokensService {
   }
 
   async getTokens(id: string): Promise<Tokens> {
-    const accessToken = await this.signJWTToken({
+    const accessToken = this.signJWTToken({
       id: id,
       duration: this.appConfigService.jwtAccessExpiresIn,
     });
 
-    const refreshToken = await this.signJWTToken({
+    const refreshToken = this.signJWTToken({
       id: id,
       duration: this.appConfigService.jwtRefreshExpiresIn,
     });

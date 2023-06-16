@@ -30,11 +30,11 @@ export class AuthService {
     return await bcrypt.hash(password, salt);
   }
 
-  async checkPassword(
+  checkPassword(
     plainPassword: string,
     encryptedPassword: string,
   ): Promise<boolean> {
-    return await bcrypt.compare(plainPassword, encryptedPassword);
+    return bcrypt.compare(plainPassword, encryptedPassword);
   }
 
   checkSocialUser(user: User): boolean {

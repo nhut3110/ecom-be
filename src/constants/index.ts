@@ -8,4 +8,6 @@ export const enum JwtTokenTypes {
   ACCESS = 'access',
 }
 
-export const tokenPrefix = 'tokens:';
+export const TOKEN_PREFIX = 'tokens';
+
+export const REDIS_TOKEN = 'REDIS';

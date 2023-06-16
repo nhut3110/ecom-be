@@ -11,16 +11,16 @@ export class ProductsService {
     @InjectModel(Product) private readonly productModel: typeof Product,
   ) {}
 
-  async create(product: CreateProductDto): Promise<Product> {
-    return await this.productModel.create(product);
+  create(product: CreateProductDto): Promise<Product> {
+    return this.productModel.create(product);
   }
 
-  async createBulk(products: CreateProductDto[]): Promise<Product[]> {
+  createBulk(products: CreateProductDto[]): Promise<Product[]> {
     return this.productModel.bulkCreate(products);
   }
 
-  async findAll(): Promise<Product[]> {
-    return await this.productModel.findAll();
+  findAll(): Promise<Product[]> {
+    return this.productModel.findAll();
   }
 
   async findOne(id: IdDto): Promise<Product> {
@@ -31,15 +31,20 @@ export class ProductsService {
     throw new Error('Product not found');
   }
 
-  async update(id: IdDto, updateProductDto: UpdateProductDto): Promise<number> {
-    const [affectedCount] = await this.productModel.update(updateProductDto, {
+  async update(
+    id: IdDto,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    await this.productModel.update(updateProductDto, {
       where: { id: id },
     });
 
-    return affectedCount;
+    return this.productModel.findOne({
+      where: { id: id },
+    });
   }
 
-  async remove(id: IdDto): Promise<number> {
+  remove(id: IdDto): Promise<number> {
     return this.productModel.destroy({ where: { id: id } });
   }
 }
