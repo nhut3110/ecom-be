@@ -9,7 +9,7 @@ import { SortValues } from 'src/constants';
 import { sortFunctions } from './products.constant';
 
 @Injectable()
-export class ProductsService {
+export class ProductService {
   constructor(
     @InjectModel(Product) private readonly productModel: typeof Product,
   ) {}
@@ -51,7 +51,7 @@ export class ProductsService {
     return this.productModel.destroy({ where: { id: id } });
   }
 
-  async getSortedAndFilteredProductList(
+  async getSortedAndFilteredList(
     sortOption?: SortValues,
     categoryId?: string,
   ): Promise<Product[]> {
@@ -69,7 +69,7 @@ export class ProductsService {
       : filteredAndSortedProducts;
   }
 
-  async searchProducts(title: string): Promise<Product[]> {
+  async search(title: string): Promise<Product[]> {
     const products = await this.productModel.findAll();
     return products.filter((product) =>
       product.title.toLowerCase().includes(title.toLowerCase()),

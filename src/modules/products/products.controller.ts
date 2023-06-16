@@ -8,7 +8,7 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { ProductsService } from './products.service';
+import { ProductService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.entity';
@@ -16,44 +16,23 @@ import { IdDto } from '../users/dto/id.dto';
 import { SortValues } from 'src/constants';
 
 @Controller('products')
-export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+export class ProductController {
+  constructor(private readonly productsService: ProductService) {}
 
   @Get('search')
-  async getSearchedProducts(@Query('title') title: string) {
-    return await this.productsService.searchProducts(title);
+  async getSearchedList(@Query('title') title: string) {
+    return await this.productsService.search(title);
   }
 
   @Get('sortAndFilter')
-  async getSortedProducts(
+  async getSortedList(
     @Query('sortType') sortType?: SortValues,
     @Query('filterCategoryId') filterCategoryId?: string,
   ): Promise<Product[]> {
-    return await this.productsService.getSortedAndFilteredProductList(
+    return await this.productsService.getSortedAndFilteredList(
       sortType,
       filterCategoryId,
     );
-  }
-
-  @Get('pagination')
-  async getPaginatedData(
-    @Query('cursor') cursor: string,
-    @Query('limit') limit: number,
-  ): Promise<any> {
-    const data = await this.productsService.getPaginationData(
-      cursor,
-      limit + 1,
-    );
-    const hasNextPage = data.length > limit;
-    const nextCursor = hasNextPage ? data[data.length - 1].id : null;
-
-    const trimmedData = hasNextPage ? data.slice(0, limit) : data;
-
-    return {
-      data: trimmedData,
-      previousCursor: cursor || null,
-      nextCursor,
-    };
   }
 
   @Get()

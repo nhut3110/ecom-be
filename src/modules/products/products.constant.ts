@@ -1,5 +1,5 @@
-import { Product } from './product.entity';
 import { SortValues } from 'src/constants';
+import { Product } from './product.entity';
 
 const sortByPriceAsc = (a: Product, b: Product) => a.price - b.price;
 

@@ -1,5 +1,5 @@
 import jwtDecode from 'jwt-decode';
-import ms from 'ms';
+import ms, { StringValue } from 'ms';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { RedisService } from 'src/modules/redis/redis.service';
 import { JwtService } from '@nestjs/jwt';
@@ -8,7 +8,6 @@ import { JwtPayload } from '../auth/types/token-payload.type';
 import { Tokens } from '../auth/types/token.type';
 import { IJwtDecode } from './interfaces/jwt-decode.interface';
 import { TOKEN_PREFIX } from 'src/constants';
-import { StringValue } from 'ms';
 
 @Injectable()
 export class TokensService {
