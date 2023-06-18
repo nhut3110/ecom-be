@@ -15,9 +15,8 @@ export const REDIS_TOKEN = 'REDIS';
 export const enum SortValues {
   AZ = 'AZ',
   ZA = 'ZA',
-  PRICE_ASC = 'PriceLH',
-  PRICE_DESC = 'PriceHL',
-  RATE_ASC = 'RateLH',
-  RATE_DESC = 'RateHL',
-  DEFAULT = 'Default',
+  PRICE_ASC = 'PriceASC',
+  PRICE_DESC = 'PriceDESC',
+  RATE_ASC = 'RateASC',
+  RATE_DESC = 'RateDESC',
 }

@@ -51,22 +51,24 @@ export class ProductService {
     return this.productModel.destroy({ where: { id: id } });
   }
 
-  async getSortedAndFilteredList(
+  getSortedAndFilteredList(
     sortOption?: SortValues,
     categoryId?: string,
   ): Promise<Product[]> {
-    let filteredAndSortedProducts = await this.productModel.findAll();
+    const filteredAndSortedProducts = {
+      where: {},
+      order: [],
+    };
 
     if (categoryId) {
-      filteredAndSortedProducts = filteredAndSortedProducts.filter(
-        (product) => product.categoryId === categoryId,
-      );
+      filteredAndSortedProducts.where = { categoryId };
     }
 
-    const sortFunction = sortFunctions[sortOption];
-    return sortFunction
-      ? filteredAndSortedProducts.sort(sortFunction)
-      : filteredAndSortedProducts;
+    if (sortOption) {
+      filteredAndSortedProducts.order.push(sortFunctions[sortOption]);
+    }
+
+    return this.productModel.findAll(filteredAndSortedProducts);
   }
 
   async search(title: string): Promise<Product[]> {
