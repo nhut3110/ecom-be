@@ -5,8 +5,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.entity';
 import { IdDto } from '../users/dto/id.dto';
-import { SortValues } from 'src/constants';
-import { sortFunctions } from './products.constant';
+import { FilterDto } from './dto/filter.dto';
 
 @Injectable()
 export class ProductService {
@@ -16,10 +15,6 @@ export class ProductService {
 
   create(product: CreateProductDto): Promise<Product> {
     return this.productModel.create(product);
-  }
-
-  createBulk(products: CreateProductDto[]): Promise<Product[]> {
-    return this.productModel.bulkCreate(products);
   }
 
   findAll(): Promise<Product[]> {
@@ -51,30 +46,22 @@ export class ProductService {
     return this.productModel.destroy({ where: { id: id } });
   }
 
-  getSortedAndFilteredList(
-    sortOption?: SortValues,
-    categoryId?: string,
-  ): Promise<Product[]> {
-    const filteredAndSortedProducts = {
-      where: {},
-      order: [],
-    };
+  findMany(filterOptions: FilterDto): Promise<Product[]> {
+    const {
+      sortBy,
+      sortDirection,
+      searchTitle = '',
+      ...filters
+    } = filterOptions;
 
-    if (categoryId) {
-      filteredAndSortedProducts.where = { categoryId };
-    }
-
-    if (sortOption) {
-      filteredAndSortedProducts.order.push(sortFunctions[sortOption]);
-    }
-
-    return this.productModel.findAll(filteredAndSortedProducts);
-  }
-
-  async search(title: string): Promise<Product[]> {
-    const products = await this.productModel.findAll();
-    return products.filter((product) =>
-      product.title.toLowerCase().includes(title.toLowerCase()),
-    );
+    return this.productModel.findAll({
+      where: {
+        ...filters,
+        title: {
+          [Op.iLike]: `%${searchTitle}%`,
+        },
+      },
+      order: sortBy && [[sortBy, sortDirection]],
+    });
   }
 }
