@@ -16,3 +16,11 @@ export enum SortDirection {
   ASC = 'ASC',
   DESC = 'DESC',
 }
+
+export enum ProductSortField {
+  PRICE = 'price',
+  ID = 'id',
+  TITLE = 'title',
+  RATE = 'rate',
+  UPDATED_AT = 'updatedAt',
+}

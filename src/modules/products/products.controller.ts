@@ -14,14 +14,16 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.entity';
 import { IdDto } from '../users/dto/id.dto';
-import { FilterDto } from './dto/filter.dto';
+import { FindManyProductDto } from './dto/find-many.dto';
 
 @Controller('products')
 export class ProductController {
   constructor(private readonly productsService: ProductService) {}
 
   @Get('filter')
-  findMany(@Query(new ValidationPipe({ whitelist: true })) filters: FilterDto) {
+  findMany(
+    @Query(new ValidationPipe({ whitelist: true })) filters: FindManyProductDto,
+  ) {
     return this.productsService.findMany(filters);
   }
 

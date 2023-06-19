@@ -5,9 +5,10 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.entity';
 import { IdDto } from '../users/dto/id.dto';
-import { FilterDto } from './dto/filter.dto';
+import { FindManyProductDto } from './dto/find-many.dto';
 import { OrderItem } from 'sequelize/types/model';
 import { IPaginateResult } from './paginate-product.interface';
+import { SortDirection } from 'src/constants';
 
 @Injectable()
 export class ProductService {
@@ -48,35 +49,40 @@ export class ProductService {
     return this.productModel.destroy({ where: { id: id } });
   }
 
-  async findMany(filterOptions: FilterDto): Promise<IPaginateResult> {
-    const {
-      sortBy,
-      sortDirection,
-      searchTitle = '',
-      cursor,
-      limit,
-      ...filters
-    } = filterOptions;
+  paginationResult(
+    list: Product[],
+    limit: number,
+    keyQueryCursor: string,
+  ): IPaginateResult {
+    const hasNextPage = list.length > limit;
+    const data = hasNextPage ? list.slice(0, -1) : list;
+    const nextCursor = hasNextPage
+      ? data[data.length - 1][keyQueryCursor]
+      : undefined;
+
+    return { data, pagination: { total: data.length, nextCursor } };
+  }
+
+  async findMany(filterOptions: FindManyProductDto): Promise<IPaginateResult> {
+    const { sortBy, sortDirection, title, cursor, limit, ...filters } =
+      filterOptions;
 
     const keyQueryCursor: string = sortBy ?? 'id';
     const defaultCursorOrder: OrderItem = ['id', 'ASC'];
+    const cursorOperator = sortDirection === SortDirection.ASC ? Op.gt : Op.lt;
 
     const data = await this.productModel.findAll({
       where: {
         title: {
-          [Op.iLike]: `%${searchTitle}%`,
+          [Op.iLike]: `%${title}%`,
         },
         ...filters,
-        ...(cursor && { [keyQueryCursor]: { [Op.gt]: cursor } }),
+        ...(cursor && { [keyQueryCursor]: { [cursorOperator]: cursor } }),
       },
       order: [sortBy ? [sortBy, sortDirection] : defaultCursorOrder],
       limit: limit + 1,
     });
 
-    const hasNextPage = data.length > limit;
-    const edges = hasNextPage ? data.slice(0, -1) : data;
-    const nextCursor = edges[edges.length - 1][keyQueryCursor];
-
-    return { pageData: edges, pageInfo: { hasNextPage, nextCursor } };
+    return this.paginationResult(data, limit, keyQueryCursor);
   }
 }
