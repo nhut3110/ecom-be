@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsUUID,
@@ -5,6 +6,7 @@ import {
   IsOptional,
   ValidateIf,
   IsDefined,
+  IsNumber,
 } from 'class-validator';
 import { SortDirection } from 'src/constants';
 
@@ -25,4 +27,13 @@ export class FilterDto {
   @IsString()
   @IsOptional()
   searchTitle: string;
+
+  @IsString()
+  @IsOptional()
+  cursor: string;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  limit: number;
 }

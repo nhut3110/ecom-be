@@ -6,6 +6,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.entity';
 import { IdDto } from '../users/dto/id.dto';
 import { FilterDto } from './dto/filter.dto';
+import { OrderItem } from 'sequelize/types/model';
+import { IPaginateResult } from './paginate-product.interface';
 
 @Injectable()
 export class ProductService {
@@ -46,22 +48,35 @@ export class ProductService {
     return this.productModel.destroy({ where: { id: id } });
   }
 
-  findMany(filterOptions: FilterDto): Promise<Product[]> {
+  async findMany(filterOptions: FilterDto): Promise<IPaginateResult> {
     const {
       sortBy,
       sortDirection,
       searchTitle = '',
+      cursor,
+      limit,
       ...filters
     } = filterOptions;
 
-    return this.productModel.findAll({
+    const keyQueryCursor: string = sortBy ?? 'id';
+    const defaultCursorOrder: OrderItem = ['id', 'ASC'];
+
+    const data = await this.productModel.findAll({
       where: {
-        ...filters,
         title: {
           [Op.iLike]: `%${searchTitle}%`,
         },
+        ...filters,
+        ...(cursor && { [keyQueryCursor]: { [Op.gt]: cursor } }),
       },
-      order: sortBy && [[sortBy, sortDirection]],
+      order: [sortBy ? [sortBy, sortDirection] : defaultCursorOrder],
+      limit: limit + 1,
     });
+
+    const hasNextPage = data.length > limit;
+    const edges = hasNextPage ? data.slice(0, -1) : data;
+    const nextCursor = edges[edges.length - 1][keyQueryCursor];
+
+    return { pageData: edges, pageInfo: { hasNextPage, nextCursor } };
   }
 }
