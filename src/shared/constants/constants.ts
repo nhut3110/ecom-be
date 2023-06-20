@@ -11,3 +11,8 @@ export const enum JwtTokenTypes {
 export const TOKEN_PREFIX = 'tokens';
 
 export const REDIS_TOKEN = 'REDIS';
+
+export enum SortDirection {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}

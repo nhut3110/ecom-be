@@ -1,6 +1,6 @@
 import { Column, DataType, ForeignKey, Table } from 'sequelize-typescript';
-import { TimestampBaseModel } from 'src/constants/base-entities/timestamp.entity';
 import { Category } from 'src/modules/categories/category.entity';
+import { TimestampBaseModel } from 'src/shared';
 
 @Table({ tableName: 'products', timestamps: false })
 export class Product extends TimestampBaseModel<Product> {
@@ -14,8 +14,8 @@ export class Product extends TimestampBaseModel<Product> {
   description: string;
 
   @ForeignKey(() => Category)
-  @Column({ type: DataType.UUID, allowNull: false })
-  category_id: string;
+  @Column({ type: DataType.UUID, allowNull: false, field: 'category_id' })
+  categoryId: string;
 
   @Column({ type: DataType.STRING, allowNull: true })
   image: string;

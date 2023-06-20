@@ -1,3 +1,3 @@
-export interface IJwtDecode {
+export interface JwtDecode {
   id: string;
 }

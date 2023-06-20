@@ -21,7 +21,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { TokensService } from '../tokens/tokens.service';
 import { UserData } from 'src/decorators/user-data.decorator';
-import { IResponse } from 'src/constants/interfaces/response.interface';
+import { Response } from 'src/shared';
 
 @Controller('auth')
 export class AuthController {
@@ -65,7 +65,7 @@ export class AuthController {
   changePassword(
     @Body() passwordData: ChangePasswordDto,
     @Req() req: Request,
-  ): Promise<IResponse> {
+  ): Promise<Response> {
     const jwtPayload: JwtPayload = req['user'];
     const id = jwtPayload.id.toString();
     if (!id) throw new BadRequestException('User not found');

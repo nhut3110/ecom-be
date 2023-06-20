@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { AppConfigModule } from 'src/modules/config/app-config.module';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import { RedisService } from './redis.service';
-import { REDIS_TOKEN } from 'src/constants';
+import { REDIS_TOKEN } from 'src/shared';
 
 @Module({
   imports: [AppConfigModule],
