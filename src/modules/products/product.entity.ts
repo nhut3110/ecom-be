@@ -1,6 +1,6 @@
 import { Column, DataType, ForeignKey, Table } from 'sequelize-typescript';
 import { Category } from 'src/modules/categories/category.entity';
-import { TimestampBaseModel } from 'src/constants';
+import { TimestampBaseModel } from 'src/shared';
 
 @Table({ tableName: 'products', timestamps: false })
 export class Product extends TimestampBaseModel<Product> {

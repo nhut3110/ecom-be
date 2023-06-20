@@ -6,8 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import { JwtPayload } from '../auth/types/token-payload.type';
 import { Tokens } from '../auth/types/token.type';
-import { IJwtDecode } from './interfaces/jwt-decode.interface';
-import { TOKEN_PREFIX } from 'src/constants';
+import { JwtDecode } from './interfaces/jwt-decode.interface';
+import { TOKEN_PREFIX } from 'src/shared';
 
 @Injectable()
 export class TokensService {
@@ -72,7 +72,7 @@ export class TokensService {
   }
 
   async requestRefreshTokens(requestedRefreshToken: string): Promise<Tokens> {
-    const decodedData: IJwtDecode = jwtDecode(requestedRefreshToken);
+    const decodedData: JwtDecode = jwtDecode(requestedRefreshToken);
     const { id } = decodedData;
     const isValidToken = await this.validateAndRemovePair(
       id,

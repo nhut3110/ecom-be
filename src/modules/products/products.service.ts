@@ -6,9 +6,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.entity';
 import { IdDto } from '../users/dto/id.dto';
 import { FindManyProductDto } from './dto/find-many.dto';
-import { OrderItem } from 'sequelize/types/model';
-import { IPaginateResult } from './paginate-product.interface';
-import { SortDirection } from 'src/constants';
+import { PaginateResult } from '../../shared/interfaces/paginate.interface';
+import { SortDirection } from 'src/shared';
 
 @Injectable()
 export class ProductService {
@@ -49,40 +48,32 @@ export class ProductService {
     return this.productModel.destroy({ where: { id: id } });
   }
 
-  paginationResult(
-    list: Product[],
-    limit: number,
-    keyQueryCursor: string,
-  ): IPaginateResult {
-    const hasNextPage = list.length > limit;
-    const data = hasNextPage ? list.slice(0, -1) : list;
-    const nextCursor = hasNextPage
-      ? data[data.length - 1][keyQueryCursor]
-      : undefined;
-
-    return { data, pagination: { total: data.length, nextCursor } };
-  }
-
-  async findMany(filterOptions: FindManyProductDto): Promise<IPaginateResult> {
+  async findMany(
+    filterOptions: FindManyProductDto,
+  ): Promise<PaginateResult<Product>> {
     const { sortBy, sortDirection, title, cursor, limit, ...filters } =
       filterOptions;
 
-    const keyQueryCursor: string = sortBy ?? 'id';
-    const defaultCursorOrder: OrderItem = ['id', 'ASC'];
     const cursorOperator = sortDirection === SortDirection.ASC ? Op.gt : Op.lt;
 
-    const data = await this.productModel.findAll({
+    const { rows, count } = await this.productModel.findAndCountAll({
       where: {
         title: {
           [Op.iLike]: `%${title}%`,
         },
         ...filters,
-        ...(cursor && { [keyQueryCursor]: { [cursorOperator]: cursor } }),
+        ...(cursor && { [sortBy]: { [cursorOperator]: cursor } }),
       },
-      order: [sortBy ? [sortBy, sortDirection] : defaultCursorOrder],
-      limit: limit + 1,
+      order: [[sortBy, sortDirection]],
+      limit: limit,
     });
 
-    return this.paginationResult(data, limit, keyQueryCursor);
+    return {
+      data: rows,
+      pagination: {
+        total: count,
+        nextCursor: rows[rows.length - 1]?.[sortBy],
+      },
+    };
   }
 }

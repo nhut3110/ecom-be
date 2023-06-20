@@ -1,7 +1,7 @@
 import * as Redis from 'redis';
 import { Injectable, Inject } from '@nestjs/common';
 import { promisify } from 'util';
-import { REDIS_TOKEN } from 'src/constants';
+import { REDIS_TOKEN } from 'src/shared';
 
 @Injectable()
 export class RedisService {

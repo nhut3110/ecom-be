@@ -14,7 +14,7 @@ import { SocialLoginPayload } from './types/social-payload.type';
 import { AppConfigService } from 'src/modules/config/app-config.service';
 import { User } from '../users/user.entity';
 import { UserDto } from '../users/dto/user.dto';
-import { AccountTypes, IResponse } from 'src/constants';
+import { AccountTypes, Response } from 'src/shared';
 
 @Injectable()
 export class AuthService {
@@ -131,7 +131,7 @@ export class AuthService {
     id: string,
     oldPassword: string,
     newPassword: string,
-  ): Promise<IResponse> {
+  ): Promise<Response> {
     if (oldPassword === newPassword)
       throw new BadRequestException(
         'New password should be different from old password',

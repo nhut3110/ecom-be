@@ -1,19 +1,11 @@
 import { IsString, IsUUID, IsEnum, IsOptional } from 'class-validator';
-import {
-  BaseFindManyDto,
-  ProductSortField,
-  SortDirection,
-} from 'src/constants';
+import { BaseFindManyDto } from 'src/shared';
 
 export class FindManyProductDto extends BaseFindManyDto {
   @IsString()
   @IsOptional()
-  @IsEnum(ProductSortField)
+  @IsEnum(['price', 'id', 'rate'])
   sortBy = 'id';
-
-  @IsEnum(SortDirection)
-  @IsOptional()
-  sortDirection = 'ASC';
 
   @IsUUID()
   @IsOptional()

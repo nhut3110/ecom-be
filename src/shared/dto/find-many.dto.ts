@@ -1,14 +1,15 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsEnum } from 'class-validator';
+import { SortDirection } from '../constants/constants';
 
 export class BaseFindManyDto {
   @IsString()
   @IsOptional()
   sortBy: string;
 
-  @IsString()
+  @IsEnum(SortDirection)
   @IsOptional()
-  sortDirection: string;
+  sortDirection = 'ASC';
 
   @IsString()
   @IsOptional()

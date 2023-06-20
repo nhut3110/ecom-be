@@ -1,6 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { Table, Column, DataType, Scopes } from 'sequelize-typescript';
-import { TimestampBaseModel } from 'src/constants/base-entities/timestamp.entity';
+import { TimestampBaseModel } from 'src/shared/entities/timestamp.entity';
 
 @Scopes(() => ({
   withoutPassword: {
