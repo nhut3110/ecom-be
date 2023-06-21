@@ -2,11 +2,11 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.query(
       'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
     );
-    return await queryInterface.createTable('products', {
+    await queryInterface.createTable('favorites', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -14,59 +14,50 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      title: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      price: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-      },
-      image: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      category_id: {
+      user_id: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'categories',
+          model: 'users',
           key: 'id',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      rate: {
-        type: Sequelize.FLOAT,
+      product_id: {
+        type: Sequelize.UUID,
         allowNull: false,
+        references: {
+          model: 'products',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-      count: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      created_at: {
+      createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         field: 'created_at',
       },
-      updated_at: {
+      updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         field: 'updated_at',
       },
     });
+
+    await queryInterface.addConstraint('favorites', {
+      fields: ['user_id', 'product_id'],
+      type: 'unique',
+      name: 'unique_user_product_pair',
+    });
   },
 
-  down: async (queryInterface) => {
+  async down(queryInterface) {
     return queryInterface.sequelize.transaction(() => {
-      return queryInterface.dropTable('products');
+      return queryInterface.dropTable('favorites');
     });
   },
 };
