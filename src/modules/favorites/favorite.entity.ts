@@ -20,5 +20,5 @@ export class Favorite extends TimestampBaseModel<Favorite> {
   productId: string;
 
   @BelongsTo(() => Product)
-  products: Product;
+  product: Product;
 }

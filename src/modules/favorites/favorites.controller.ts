@@ -9,14 +9,14 @@ import {
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
-import { FavoritesService } from './favorites.service';
+import { FavoritesService as FavoriteService } from './favorites.service';
 import { FavoriteDto, FindManyFavoriteDto } from './dto';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { UserData } from 'src/decorators/user-data.decorator';
 
-@Controller('favorites')
-export class FavoritesController {
-  constructor(private readonly favoriteService: FavoritesService) {}
+@Controller('my-favorites')
+export class FavoriteController {
+  constructor(private readonly favoriteService: FavoriteService) {}
 
   @UseGuards(JwtAuthGuard)
   @Get()
@@ -25,13 +25,7 @@ export class FavoritesController {
     @Query(new ValidationPipe({ whitelist: true }))
     filters: FindManyFavoriteDto,
   ) {
-    return this.favoriteService.findMany(userId, filters);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('all')
-  async get(@UserData('id') userId: string) {
-    return this.favoriteService.getByUserId(userId);
+    return this.favoriteService.findProductList(userId, filters);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -42,9 +36,8 @@ export class FavoritesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete()
-  async remove(@UserData('id') userId: string, @Body() body: FavoriteDto) {
-    const { productId } = body;
+  @Delete(':productId')
+  async remove(@UserData('id') userId: string, @Param() productId: string) {
     return this.favoriteService.remove(userId, productId);
   }
 }

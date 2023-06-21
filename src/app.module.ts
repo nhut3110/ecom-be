@@ -13,7 +13,7 @@ import { Category } from './modules/categories/category.entity';
 import { Product } from './modules/products/product.entity';
 import { TokensModule } from './modules/tokens/tokens.module';
 import { RedisModule } from './modules/redis/redis.module';
-import { FavoritesModule } from './modules/favorites/favorites.module';
+import { FavoriteModule } from './modules/favorites/favorites.module';
 import { Favorite } from './modules/favorites/favorite.entity';
 
 @Module({
@@ -42,7 +42,7 @@ import { Favorite } from './modules/favorites/favorite.entity';
     }),
     TokensModule,
     RedisModule,
-    FavoritesModule,
+    FavoriteModule,
   ],
   providers: [CloudinaryService],
 })

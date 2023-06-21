@@ -11,19 +11,15 @@ export class FavoritesService {
   constructor(
     @InjectModel(Favorite)
     private readonly favoriteModel: typeof Favorite,
+    @InjectModel(Product)
+    private readonly productModel: typeof Product,
   ) {}
-
-  getByUserId(userId: string): Promise<Favorite[]> {
-    return this.favoriteModel.findAll({
-      where: { userId },
-      include: [Product],
-    });
-  }
 
   async add(userId: string, productId: string): Promise<Favorite> {
     const product = await this.favoriteModel.findOne({
       where: { userId, productId },
     });
+
     if (product)
       throw new BadRequestException('Product already exists in favorites');
 
@@ -34,26 +30,31 @@ export class FavoritesService {
     return this.favoriteModel.destroy({ where: { userId, productId } });
   }
 
-  async findMany(
+  async findProductList(
     userId: string,
     filterOptions: FindManyFavoriteDto,
-  ): Promise<PaginateResult<Favorite>> {
+  ): Promise<PaginateResult<Product>> {
     const { sortBy, sortDirection, title, cursor, limit, ...filters } =
       filterOptions;
 
     const cursorOperator = sortDirection === SortDirection.ASC ? Op.gt : Op.lt;
 
-    const { rows, count } = await this.favoriteModel.findAndCountAll({
+    const { rows, count } = await this.productModel.findAndCountAll({
       include: [
-        { model: Product, where: { title: { [Op.iLike]: `%${title}%` } } },
+        {
+          model: Favorite,
+          where: { userId },
+          required: true,
+          attributes: [],
+        },
       ],
       where: {
-        userId,
+        title: { [Op.iLike]: `%${title}%` },
         ...filters,
         ...(cursor && { [sortBy]: { [cursorOperator]: cursor } }),
       },
-      order: [[sortBy, sortDirection]],
       limit: limit,
+      order: [[sortBy, sortDirection]],
     });
 
     return {

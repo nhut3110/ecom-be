@@ -66,7 +66,7 @@ module.exports = {
 
   down: async (queryInterface) => {
     return queryInterface.sequelize.transaction(() => {
-      return Promise.all([queryInterface.dropTable('products')]);
+      return queryInterface.dropTable('products');
     });
   },
 };

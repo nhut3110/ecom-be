@@ -1,6 +1,13 @@
-import { Column, DataType, ForeignKey, Table } from 'sequelize-typescript';
+import {
+  Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  Table,
+} from 'sequelize-typescript';
 import { Category } from 'src/modules/categories/category.entity';
 import { TimestampBaseModel } from 'src/shared';
+import { Favorite } from '../favorites/favorite.entity';
 
 @Table({ tableName: 'products', timestamps: false })
 export class Product extends TimestampBaseModel<Product> {
@@ -25,4 +32,7 @@ export class Product extends TimestampBaseModel<Product> {
 
   @Column({ type: DataType.INTEGER, allowNull: true })
   count: number;
+
+  @HasMany(() => Favorite)
+  favorite: Favorite[];
 }
