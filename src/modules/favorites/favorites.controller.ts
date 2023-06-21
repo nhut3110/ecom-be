@@ -4,47 +4,47 @@ import {
   Post,
   Delete,
   Param,
-  Query,
   Body,
+  Query,
+  ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
-import { Product } from '../products/product.entity';
-import { SortValues } from 'src/constants';
-import { FavoriteDto } from './dto/favorite.dto';
+import { FavoriteDto, FindManyFavoriteDto } from './dto';
+import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
+import { UserData } from 'src/decorators/user-data.decorator';
 
 @Controller('favorites')
 export class FavoritesController {
   constructor(private readonly favoriteService: FavoritesService) {}
 
-  @Get('sortAndFilter')
-  async getSortedProducts(
-    @Query('userId') userId: string,
-    @Query('sortType') sortType?: SortValues,
-    @Query('filterCategoryId') filterCategoryId?: string,
-  ): Promise<Product[]> {
-    return await this.favoriteService.getSortedAndFilteredFavoriteList(
-      userId,
-      sortType,
-      filterCategoryId,
-    );
-  }
-
-  @Get(':userId')
-  async getFavoriteProductList(@Param('userId') userId: string) {
-    return this.favoriteService.getFavoriteProductListByUserId(userId);
-  }
-
-  @Post()
-  async addProductToFavorite(@Body() body: FavoriteDto) {
-    const { userId, productId } = body;
-    return this.favoriteService.addProductToFavorite(userId, productId);
-  }
-
-  @Delete(':userId/:productId')
-  async removeProductFromFavorite(
-    @Param('userId') userId: string,
-    @Param('productId') productId: string,
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  findMany(
+    @UserData('id') userId: string,
+    @Query(new ValidationPipe({ whitelist: true }))
+    filters: FindManyFavoriteDto,
   ) {
-    return this.favoriteService.removeProductFromFavorite(userId, productId);
+    return this.favoriteService.findMany(userId, filters);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('all')
+  async get(@UserData('id') userId: string) {
+    return this.favoriteService.getByUserId(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async add(@UserData('id') userId: string, @Body() body: FavoriteDto) {
+    const { productId } = body;
+    return this.favoriteService.add(userId, productId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  async remove(@UserData('id') userId: string, @Body() body: FavoriteDto) {
+    const { productId } = body;
+    return this.favoriteService.remove(userId, productId);
   }
 }

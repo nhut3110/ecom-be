@@ -6,11 +6,5 @@ export class FavoriteDto {
   @IsNotEmpty()
   @IsUUID()
   @ApiProperty()
-  userId: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsUUID()
-  @ApiProperty()
   productId: string;
 }

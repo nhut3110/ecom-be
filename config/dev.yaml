@@ -4,7 +4,7 @@ salt: 10
 
 jwt:
   secret-key: hehe
-  access-token-expire-in: 10s
+  access-token-expire-in: 1h
   refresh-token-expire-in: 3d
 
 facebook:

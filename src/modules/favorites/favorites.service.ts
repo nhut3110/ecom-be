@@ -1,35 +1,26 @@
+import { Op } from 'sequelize';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Favorite } from './favorite.entity';
 import { Product } from '../products/product.entity';
-import { SortValues } from 'src/constants';
-import { sortFunctions } from '../products/products.constant';
+import { FindManyFavoriteDto } from './dto/find-many.dto';
+import { PaginateResult, SortDirection } from 'src/shared';
 
 @Injectable()
 export class FavoritesService {
   constructor(
     @InjectModel(Favorite)
     private readonly favoriteModel: typeof Favorite,
-    @InjectModel(Product)
-    private readonly productModel: typeof Product,
   ) {}
 
-  async getFavoriteProductListByUserId(userId: string): Promise<Product[]> {
-    const favorites = await this.favoriteModel.findAll({
+  getByUserId(userId: string): Promise<Favorite[]> {
+    return this.favoriteModel.findAll({
       where: { userId },
-    });
-
-    const productIds = favorites.map((favorite) => favorite.productId);
-
-    return this.productModel.findAll({
-      where: { id: productIds },
+      include: [Product],
     });
   }
 
-  async addProductToFavorite(
-    userId: string,
-    productId: string,
-  ): Promise<Favorite> {
+  async add(userId: string, productId: string): Promise<Favorite> {
     const product = await this.favoriteModel.findOne({
       where: { userId, productId },
     });
@@ -39,31 +30,38 @@ export class FavoritesService {
     return await this.favoriteModel.create({ userId, productId });
   }
 
-  async removeProductFromFavorite(
-    userId: string,
-    productId: string,
-  ): Promise<void> {
-    await this.favoriteModel.destroy({ where: { userId, productId } });
+  remove(userId: string, productId: string): Promise<number> {
+    return this.favoriteModel.destroy({ where: { userId, productId } });
   }
 
-  async getSortedAndFilteredFavoriteList(
+  async findMany(
     userId: string,
-    sortOption?: SortValues,
-    categoryId?: string,
-  ): Promise<Product[]> {
-    let filteredAndSortedProducts = await this.getFavoriteProductListByUserId(
-      userId,
-    );
+    filterOptions: FindManyFavoriteDto,
+  ): Promise<PaginateResult<Favorite>> {
+    const { sortBy, sortDirection, title, cursor, limit, ...filters } =
+      filterOptions;
 
-    if (categoryId) {
-      filteredAndSortedProducts = filteredAndSortedProducts.filter(
-        (product) => product.categoryId === categoryId,
-      );
-    }
+    const cursorOperator = sortDirection === SortDirection.ASC ? Op.gt : Op.lt;
 
-    const sortFunction = sortFunctions[sortOption];
-    return sortFunction
-      ? filteredAndSortedProducts.sort(sortFunction)
-      : filteredAndSortedProducts;
+    const { rows, count } = await this.favoriteModel.findAndCountAll({
+      include: [
+        { model: Product, where: { title: { [Op.iLike]: `%${title}%` } } },
+      ],
+      where: {
+        userId,
+        ...filters,
+        ...(cursor && { [sortBy]: { [cursorOperator]: cursor } }),
+      },
+      order: [[sortBy, sortDirection]],
+      limit: limit,
+    });
+
+    return {
+      data: rows,
+      pagination: {
+        total: count,
+        nextCursor: rows[rows.length - 1]?.[sortBy],
+      },
+    };
   }
 }
