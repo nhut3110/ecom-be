@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Favorite } from './favorite.entity';
 import { Product } from '../products/product.entity';
 import { FindManyFavoriteDto } from './dto/find-many.dto';
-import { PaginateResult, SortDirection } from 'src/shared';
+import { MAX_FAVORITE, PaginateResult, SortDirection } from 'src/shared';
 
 @Injectable()
 export class FavoritesService {
@@ -16,6 +16,11 @@ export class FavoritesService {
   ) {}
 
   async add(userId: string, productId: string): Promise<Favorite> {
+    const count = await this.favoriteModel.count({ where: { userId } });
+
+    if (count > MAX_FAVORITE)
+      throw new BadRequestException('Too many favorites');
+
     const product = await this.favoriteModel.findOne({
       where: { userId, productId },
     });

@@ -9,7 +9,6 @@ export class ProductController {
   constructor(private readonly productsService: ProductService) {}
   @Get(':id')
   findOne(@Param('id') id: IdDto): Promise<Product> {
-    console.log(id);
     return this.productsService.findOne(id);
   }
 
