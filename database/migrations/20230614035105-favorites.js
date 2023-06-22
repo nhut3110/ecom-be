@@ -51,7 +51,7 @@ module.exports = {
     await queryInterface.addConstraint('favorites', {
       fields: ['user_id', 'product_id'],
       type: 'unique',
-      name: 'unique_user_product_pair',
+      name: 'unique_favorite_user_product_pair',
     });
   },
 

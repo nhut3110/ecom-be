@@ -7,65 +7,65 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { CartsService } from './carts.service';
+import { CartService } from './carts.service';
 import { CartOutput } from './interfaces/card-output.interface';
 import { CartDto } from './dto/cart.dto';
 import { Cart } from './cart.entity';
+import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
+import { UserData } from 'src/decorators/user-data.decorator';
 
 @Controller('carts')
-export class CartsController {
-  constructor(private readonly cartsService: CartsService) {}
+export class CartController {
+  constructor(private readonly cartsService: CartService) {}
 
-  @Get(':userId')
-  async getCartByUserId(@Param('userId') userId: string): Promise<CartOutput> {
-    return await this.cartsService.getCart(userId);
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getCartByUserId(@UserData('id') userId: string): Promise<CartOutput> {
+    return await this.cartsService.get(userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async addToCart(
+    @UserData('id') userId: string,
     @Body() body: CartDto,
-  ): Promise<Cart | [affectedCount: number]> {
-    const { userId, productId, quantity } = body;
-    return await this.cartsService.addProductToCart(
+  ): Promise<Cart> {
+    const { productId, quantity } = body;
+    return await this.cartsService.addProductToCart({
       userId,
       productId,
       quantity,
-    );
+    });
   }
 
-  @Patch('increaseOne')
-  async increaseQuantity(
-    @Query('userId') userId: string,
-    @Query('productId') productId: string,
-  ): Promise<void> {
-    return await this.cartsService.increaseProductQuantityByOne(
+  @UseGuards(JwtAuthGuard)
+  @Patch(':productId')
+  async updateQuantity(
+    @UserData('id') userId: string,
+    @Param('productId') productId: string,
+    @Query('quantity') quantity: number,
+  ): Promise<Cart> {
+    return await this.cartsService.updateQuantity({
       userId,
       productId,
-    );
+      quantity,
+    });
   }
 
-  @Patch('decreaseOne')
-  async decreaseQuantity(
-    @Query('userId') userId: string,
-    @Query('productId') productId: string,
-  ): Promise<void> {
-    return await this.cartsService.decreaseProductQuantityByOne(
-      userId,
-      productId,
-    );
-  }
-
-  @Delete()
+  @UseGuards(JwtAuthGuard)
+  @Delete(':productId')
   async deleteProductFromCart(
-    @Query('userId') userId: string,
-    @Query('productId') productId: string,
+    @UserData('id') userId: string,
+    @Param('productId') productId: string,
   ): Promise<number> {
     return await this.cartsService.removeProductFromCart(userId, productId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('clear/:userId')
-  async clearCart(@Param('userId') userId: string): Promise<number> {
-    return await this.cartsService.clearCart(userId);
+  async clearCart(@UserData('id') userId: string): Promise<number> {
+    return await this.cartsService.clear(userId);
   }
 }

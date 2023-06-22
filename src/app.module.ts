@@ -15,7 +15,7 @@ import { TokensModule } from './modules/tokens/tokens.module';
 import { RedisModule } from './modules/redis/redis.module';
 import { FavoriteModule } from './modules/favorites/favorites.module';
 import { Favorite } from './modules/favorites/favorite.entity';
-import { CartsModule } from './modules/carts/carts.module';
+import { CartModule } from './modules/carts/carts.module';
 import { Cart } from './modules/carts/cart.entity';
 
 @Module({
@@ -28,7 +28,7 @@ import { Cart } from './modules/carts/cart.entity';
     CategoriesModule,
     SequelizeModule.forRootAsync({
       imports: [AppConfigModule],
-      useFactory: (appConfigService: AppConfigService) => {
+      useFactory: async (appConfigService: AppConfigService) => {
         return {
           username: appConfigService.postgresUser,
           password: appConfigService.postgresPassword,
@@ -45,7 +45,7 @@ import { Cart } from './modules/carts/cart.entity';
     TokensModule,
     RedisModule,
     FavoriteModule,
-    CartsModule,
+    CartModule,
   ],
   providers: [CloudinaryService],
 })

@@ -4,43 +4,37 @@ import { Cart } from './cart.entity';
 import { Product } from '../products/product.entity';
 import { createCartResponse } from './utils/createCartResponse';
 import { CartOutput } from './interfaces/card-output.interface';
+import { CartDto } from './dto/cart.dto';
 
 @Injectable()
-export class CartsService {
+export class CartService {
   constructor(
     @InjectModel(Cart)
     private readonly cartModel: typeof Cart,
-    @InjectModel(Product)
-    private readonly productModel: typeof Product,
   ) {}
 
-  async addProductToCart(
-    userId: string,
-    productId: string,
-    quantity: number,
-  ): Promise<Cart | [affectedCount: number]> {
+  async addProductToCart({
+    userId,
+    productId,
+    quantity,
+  }: CartDto): Promise<Cart> {
     const cartProduct = await this.cartModel.findOne({
       where: { userId, productId },
     });
 
     if (cartProduct)
-      return await this.cartModel.update(
-        { quantity: cartProduct.quantity + quantity },
-        { where: { userId, productId } },
-      );
+      return await this.updateQuantity({ userId, productId, quantity });
 
     return await this.cartModel.create({ userId, productId, quantity });
   }
 
-  async getCart(userId: string): Promise<CartOutput> {
-    const cart = await this.cartModel.findAll({ where: { userId } });
-
-    const productIds = cart.map((item) => item.productId);
-    const productList = await this.productModel.findAll({
-      where: { id: productIds },
+  async get(userId: string): Promise<CartOutput> {
+    const cart = await this.cartModel.findAll({
+      where: { userId },
+      include: [Product],
     });
 
-    return createCartResponse(cart, productList);
+    return createCartResponse(cart);
   }
 
   async removeProductFromCart(
@@ -50,34 +44,21 @@ export class CartsService {
     return await this.cartModel.destroy({ where: { userId, productId } });
   }
 
-  async clearCart(userId: string): Promise<number> {
+  async clear(userId: string): Promise<number> {
     return await this.cartModel.destroy({ where: { userId } });
   }
 
-  async increaseProductQuantityByOne(
-    userId: string,
-    productId: string,
-  ): Promise<void> {
+  async updateQuantity({
+    userId,
+    productId,
+    quantity,
+  }: CartDto): Promise<Cart> {
     const cartItem = await this.cartModel.findOne({
       where: { userId, productId },
     });
 
     if (cartItem) {
-      cartItem.quantity += 1;
-      await cartItem.save();
-    }
-  }
-
-  async decreaseProductQuantityByOne(
-    userId: string,
-    productId: string,
-  ): Promise<void> {
-    const cartItem = await this.cartModel.findOne({
-      where: { userId, productId },
-    });
-
-    if (cartItem) {
-      cartItem.quantity -= 1;
+      cartItem.quantity += Number(quantity);
 
       if (cartItem.quantity <= 0) {
         await cartItem.destroy();
@@ -85,5 +66,6 @@ export class CartsService {
         await cartItem.save();
       }
     }
+    return cartItem;
   }
 }

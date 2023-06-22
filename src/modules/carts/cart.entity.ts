@@ -1,7 +1,13 @@
-import { Column, DataType, ForeignKey, Table } from 'sequelize-typescript';
-import { TimestampBaseModel } from 'src/constants/base-entities/timestamp.entity';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Table,
+} from 'sequelize-typescript';
 import { User } from '../users/user.entity';
 import { Product } from '../products/product.entity';
+import { TimestampBaseModel } from 'src/shared';
 
 @Table({ tableName: 'carts' })
 export class Cart extends TimestampBaseModel<Cart> {
@@ -15,4 +21,7 @@ export class Cart extends TimestampBaseModel<Cart> {
 
   @Column({ type: DataType.NUMBER, allowNull: false })
   quantity: number;
+
+  @BelongsTo(() => Product)
+  product: Product;
 }

@@ -51,11 +51,17 @@ module.exports = {
         field: 'updated_at',
       },
     });
+
+    await queryInterface.addConstraint('carts', {
+      fields: ['user_id', 'product_id'],
+      type: 'unique',
+      name: 'unique_cart_user_product_pair',
+    });
   },
 
   async down(queryInterface) {
     return queryInterface.sequelize.transaction(() => {
-      return Promise.all([queryInterface.dropTable('carts')]);
+      return queryInterface.dropTable('carts');
     });
   },
 };
