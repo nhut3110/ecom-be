@@ -28,7 +28,7 @@ import { Cart } from './modules/carts/cart.entity';
     CategoriesModule,
     SequelizeModule.forRootAsync({
       imports: [AppConfigModule],
-      useFactory: async (appConfigService: AppConfigService) => {
+      useFactory: (appConfigService: AppConfigService) => {
         return {
           username: appConfigService.postgresUser,
           password: appConfigService.postgresPassword,
