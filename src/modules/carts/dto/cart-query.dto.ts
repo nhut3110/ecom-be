@@ -4,10 +4,5 @@ export class CartQueryDto {
   @IsString()
   @IsNotEmpty()
   @IsUUID()
-  userId: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsUUID()
   productId: string;
 }

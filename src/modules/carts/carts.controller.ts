@@ -8,9 +8,9 @@ import {
   Delete,
   Query,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CartService } from './carts.service';
-import { CartOutput } from './interfaces/card-output.interface';
 import { CartDto } from './dto/cart.dto';
 import { Cart } from './cart.entity';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
@@ -22,18 +22,18 @@ export class CartController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getCartByUserId(@UserData('id') userId: string): Promise<CartOutput> {
-    return await this.cartsService.get(userId);
+  getCartByUserId(@UserData('id') userId: string): Promise<Cart[]> {
+    return this.cartsService.get(userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async addToCart(
+  addToCart(
     @UserData('id') userId: string,
     @Body() body: CartDto,
-  ): Promise<Cart> {
+  ): Promise<void | Cart> {
     const { productId, quantity } = body;
-    return await this.cartsService.addProductToCart({
+    return this.cartsService.addProductToCart({
       userId,
       productId,
       quantity,
@@ -42,12 +42,12 @@ export class CartController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':productId')
-  async updateQuantity(
+  updateQuantity(
     @UserData('id') userId: string,
     @Param('productId') productId: string,
-    @Query('quantity') quantity: number,
-  ): Promise<Cart> {
-    return await this.cartsService.updateQuantity({
+    @Query('quantity', ParseIntPipe) quantity: number,
+  ): Promise<void | Cart> {
+    return this.cartsService.updateQuantity({
       userId,
       productId,
       quantity,
@@ -56,16 +56,16 @@ export class CartController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':productId')
-  async deleteProductFromCart(
+  deleteProductFromCart(
     @UserData('id') userId: string,
     @Param('productId') productId: string,
   ): Promise<number> {
-    return await this.cartsService.removeProductFromCart(userId, productId);
+    return this.cartsService.removeProductFromCart(userId, productId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('clear/:userId')
-  async clearCart(@UserData('id') userId: string): Promise<number> {
-    return await this.cartsService.clear(userId);
+  clearCart(@UserData('id') userId: string): Promise<number> {
+    return this.cartsService.clear(userId);
   }
 }
