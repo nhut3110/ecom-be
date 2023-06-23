@@ -16,3 +16,5 @@ export enum SortDirection {
   ASC = 'ASC',
   DESC = 'DESC',
 }
+
+export const MAX_FAVORITE = 100;
