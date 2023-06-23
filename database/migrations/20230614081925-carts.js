@@ -55,13 +55,16 @@ module.exports = {
     await queryInterface.addConstraint('carts', {
       fields: ['user_id', 'product_id'],
       type: 'unique',
-      name: 'unique_cart_user_product_pair',
+      name: 'cart_user_id_product_id',
     });
   },
 
   async down(queryInterface) {
     return queryInterface.sequelize.transaction(() => {
-      return queryInterface.dropTable('carts');
+      return Promise.all([
+        queryInterface.dropTable('carts'),
+        queryInterface.removeConstraint('carts', 'cart_user_id_product_id'),
+      ]);
     });
   },
 };

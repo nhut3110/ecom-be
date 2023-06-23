@@ -51,13 +51,19 @@ module.exports = {
     await queryInterface.addConstraint('favorites', {
       fields: ['user_id', 'product_id'],
       type: 'unique',
-      name: 'unique_favorite_user_product_pair',
+      name: 'favorites_user_id_product_id',
     });
   },
 
   async down(queryInterface) {
     return queryInterface.sequelize.transaction(() => {
-      return queryInterface.dropTable('favorites');
+      return Promise.all([
+        queryInterface.dropTable('favorites'),
+        queryInterface.removeConstraint(
+          'favorites',
+          'favorites_user_id_product_id',
+        ),
+      ]);
     });
   },
 };

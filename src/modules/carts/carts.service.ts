@@ -1,9 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Cart } from './cart.entity';
 import { Product } from '../products/product.entity';
-import { createCartResponse } from './utils/createCartResponse';
-import { CartOutput } from './interfaces/card-output.interface';
 import { CartDto } from './dto/cart.dto';
 
 @Injectable()
@@ -17,7 +15,7 @@ export class CartService {
     userId,
     productId,
     quantity,
-  }: CartDto): Promise<Cart> {
+  }: CartDto): Promise<void | Cart> {
     const cartProduct = await this.cartModel.findOne({
       where: { userId, productId },
     });
@@ -28,44 +26,41 @@ export class CartService {
     return await this.cartModel.create({ userId, productId, quantity });
   }
 
-  async get(userId: string): Promise<CartOutput> {
-    const cart = await this.cartModel.findAll({
+  get(userId: string): Promise<Cart[]> {
+    return this.cartModel.findAll({
       where: { userId },
-      include: [Product],
+      include: [
+        { model: Product, attributes: ['id', 'title', 'image', 'price'] },
+      ],
+      attributes: ['quantity'],
     });
-
-    return createCartResponse(cart);
   }
 
-  async removeProductFromCart(
-    userId: string,
-    productId: string,
-  ): Promise<number> {
-    return await this.cartModel.destroy({ where: { userId, productId } });
+  removeProductFromCart(userId: string, productId: string): Promise<number> {
+    return this.cartModel.destroy({ where: { userId, productId } });
   }
 
-  async clear(userId: string): Promise<number> {
-    return await this.cartModel.destroy({ where: { userId } });
+  clear(userId: string): Promise<number> {
+    return this.cartModel.destroy({ where: { userId } });
   }
 
   async updateQuantity({
     userId,
     productId,
     quantity,
-  }: CartDto): Promise<Cart> {
+  }: CartDto): Promise<void | Cart> {
     const cartItem = await this.cartModel.findOne({
       where: { userId, productId },
     });
 
-    if (cartItem) {
-      cartItem.quantity += Number(quantity);
+    if (!cartItem) throw new BadRequestException('Invalid cart item');
 
-      if (cartItem.quantity <= 0) {
-        await cartItem.destroy();
-      } else {
-        await cartItem.save();
-      }
-    }
+    cartItem.quantity += quantity;
+
+    if (cartItem.quantity <= 0) return await cartItem.destroy();
+
+    await cartItem.save();
+
     return cartItem;
   }
 }
