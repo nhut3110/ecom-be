@@ -3,7 +3,10 @@ import {
   IsNotEmpty,
   IsEmail,
   IsOptional,
+  IsNumber,
   IsPhoneNumber,
+  IsLongitude,
+  IsLatitude,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -21,35 +24,22 @@ export class AddressDto {
   @IsPhoneNumber()
   @IsNotEmpty()
   @ApiProperty()
-  phoneNumber?: string;
+  phoneNumber: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  houseNumber?: string;
+  address: string;
 
-  @IsString()
+  @IsNumber()
+  @IsLongitude()
   @IsNotEmpty()
   @ApiProperty()
-  street: string;
+  lng: number;
 
-  @IsString()
+  @IsNumber()
+  @IsLatitude()
   @IsNotEmpty()
   @ApiProperty()
-  ward: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  district: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  city: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  country: string;
+  lat: number;
 }

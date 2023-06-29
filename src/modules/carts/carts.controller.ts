@@ -55,17 +55,17 @@ export class CartController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Delete('clear')
+  clearCart(@UserData('id') userId: string): Promise<number> {
+    return this.cartsService.clear(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete(':productId')
   deleteProductFromCart(
     @UserData('id') userId: string,
     @Param('productId') productId: string,
   ): Promise<number> {
     return this.cartsService.removeProductFromCart(userId, productId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete('clear/:userId')
-  clearCart(@UserData('id') userId: string): Promise<number> {
-    return this.cartsService.clear(userId);
   }
 }

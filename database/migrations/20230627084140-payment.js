@@ -6,7 +6,7 @@ module.exports = {
     await queryInterface.sequelize.query(
       'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
     );
-    await queryInterface.createTable('addresses', {
+    await queryInterface.createTable('payment', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -24,28 +24,20 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      name: {
+      card_number: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      phone_number: {
+      card_owner: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      address: {
+      cvc: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      lat: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-      lng: {
-        type: Sequelize.FLOAT,
+      expiry: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
       created_at: {
@@ -65,7 +57,7 @@ module.exports = {
 
   async down(queryInterface) {
     return queryInterface.sequelize.transaction(() => {
-      return queryInterface.dropTable('addresses');
+      return queryInterface.dropTable('payment');
     });
   },
 };

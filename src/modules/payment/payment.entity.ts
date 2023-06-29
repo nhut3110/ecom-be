@@ -2,46 +2,39 @@ import { Column, DataType, ForeignKey, Table } from 'sequelize-typescript';
 import { User } from '../users/user.entity';
 import { TimestampBaseModel } from 'src/shared';
 
-@Table({ tableName: 'addresses' })
-export class Address extends TimestampBaseModel<Address> {
+@Table({ tableName: 'payment' })
+export class Payment extends TimestampBaseModel<Payment> {
   @ForeignKey(() => User)
-  @Column({ type: DataType.UUID, field: 'user_id', allowNull: false })
+  @Column({
+    type: DataType.UUID,
+    field: 'user_id',
+    allowNull: false,
+  })
   userId: string;
 
   @Column({
     type: DataType.STRING,
+    field: 'card_number',
     allowNull: false,
   })
-  name: string;
+  cardNumber: string;
 
   @Column({
     type: DataType.STRING,
+    field: 'card_owner',
     allowNull: true,
   })
-  email: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-    field: 'phone_number',
-  })
-  phoneNumber: string;
+  cardOwner: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  address: string;
+  cvc: string;
 
   @Column({
-    type: DataType.FLOAT,
+    type: DataType.STRING,
     allowNull: false,
   })
-  lat: number;
-
-  @Column({
-    type: DataType.FLOAT,
-    allowNull: false,
-  })
-  lng: number;
+  expiry: string;
 }
