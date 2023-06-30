@@ -2,11 +2,11 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.query(
       'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
     );
-    await queryInterface.createTable('addresses', {
+    await queryInterface.createTable('order_details', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -14,38 +14,28 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      user_id: {
+      order_id: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'users',
+          model: 'orders',
           key: 'id',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      name: {
-        type: Sequelize.STRING,
+      product_id: {
+        type: Sequelize.UUID,
         allowNull: false,
+        references: {
+          model: 'products',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      phone_number: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      address: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      lat: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-      lng: {
-        type: Sequelize.FLOAT,
+      quantity: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       created_at: {
@@ -61,9 +51,23 @@ module.exports = {
         field: 'updated_at',
       },
     });
+
+    await queryInterface.addConstraint('order_details', {
+      fields: ['order_id', 'product_id'],
+      type: 'unique',
+      name: 'order_detail_order_id_product_id',
+    });
   },
 
-  async down(queryInterface) {
-    return queryInterface.dropTable('addresses');
+  down: async (queryInterface) => {
+    return queryInterface.sequelize.transaction(() => {
+      return Promise.all([
+        queryInterface.removeConstraint(
+          'order_details',
+          'order_detail_order_id_product_id',
+        ),
+        queryInterface.dropTable('order_details'),
+      ]);
+    });
   },
 };

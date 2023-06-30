@@ -2,11 +2,11 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.query(
       'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
     );
-    await queryInterface.createTable('addresses', {
+    await queryInterface.createTable('orders', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -24,29 +24,45 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      name: {
-        type: Sequelize.STRING,
+      address_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'addresses',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      payment_type: {
+        type: Sequelize.ENUM('cash', 'card'),
         allowNull: false,
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
+      payment_id: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'payment',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-      phone_number: {
-        type: Sequelize.STRING,
-        allowNull: false,
+      order_status: {
+        type: Sequelize.ENUM(
+          'pending',
+          'confirmed',
+          'paid',
+          'shipping',
+          'completed',
+          'canceled',
+        ),
+        allowNull: true,
+        defaultValue: 'pending',
       },
-      address: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      lat: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-      lng: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,
@@ -63,7 +79,7 @@ module.exports = {
     });
   },
 
-  async down(queryInterface) {
-    return queryInterface.dropTable('addresses');
+  down: async (queryInterface) => {
+    return queryInterface.dropTable('orders');
   },
 };

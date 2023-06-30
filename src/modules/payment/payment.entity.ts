@@ -22,7 +22,7 @@ export class Payment extends TimestampBaseModel<Payment> {
   @Column({
     type: DataType.STRING,
     field: 'card_owner',
-    allowNull: true,
+    allowNull: false,
   })
   cardOwner: string;
 

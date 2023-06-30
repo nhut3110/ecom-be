@@ -56,8 +56,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.sequelize.transaction(() => {
-      return queryInterface.dropTable('payment');
-    });
+    return queryInterface.dropTable('payment');
   },
 };

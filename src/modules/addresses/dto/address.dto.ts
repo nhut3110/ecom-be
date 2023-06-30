@@ -2,7 +2,6 @@ import {
   IsString,
   IsNotEmpty,
   IsEmail,
-  IsOptional,
   IsNumber,
   IsPhoneNumber,
   IsLongitude,
@@ -17,8 +16,8 @@ export class AddressDto {
   name: string;
 
   @IsEmail()
-  @IsOptional()
-  @ApiProperty({ required: false })
+  @IsNotEmpty()
+  @ApiProperty()
   email: string;
 
   @IsPhoneNumber()

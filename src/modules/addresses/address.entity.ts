@@ -5,7 +5,11 @@ import { TimestampBaseModel } from 'src/shared';
 @Table({ tableName: 'addresses' })
 export class Address extends TimestampBaseModel<Address> {
   @ForeignKey(() => User)
-  @Column({ type: DataType.UUID, field: 'user_id', allowNull: false })
+  @Column({
+    type: DataType.UUID,
+    field: 'user_id',
+    allowNull: false,
+  })
   userId: string;
 
   @Column({
@@ -16,7 +20,7 @@ export class Address extends TimestampBaseModel<Address> {
 
   @Column({
     type: DataType.STRING,
-    allowNull: true,
+    allowNull: false,
   })
   email: string;
 
