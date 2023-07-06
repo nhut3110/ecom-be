@@ -29,3 +29,13 @@ redis:
   url: redis://127.0.0.1:6379
   host: 127.0.0.1
   port: 6379
+
+google:
+  client-id: 437786877308-s7bfl5kvrc9ne92o94o5v1ikng7h6pjj.apps.googleusercontent.com
+  client-secret: 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
+  token: 1//04kzqaW_QruhnCgYIARAAGAQSNwF-L9Irp61ynMgS5o-CEJ5KAgn7m8WIErtUxaF0KCp8b8_j3GZEYF4eK0wiQWY9yqsiXtKk7M4
+  oauth2-callback-url: https://developers.google.com/oauthplayground
+
+otp:
+  ttl: 5m
+  refresh-otp-time: 3m

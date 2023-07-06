@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title>Order Confirmation</title>
+    <style>
+      body { font-family: Arial, sans-serif; } h1 { color: #333; }
+      .order-details { margin-top: 20px; margin-bottom: 40px; } .order-details
+      li { margin-bottom: 10px; display: flex; align-items: center; }
+      .order-details img { width: 80px; height: auto; margin-right: 10px; }
+      .order-details .product-title { font-weight: bold; } .total-value {
+      font-weight: bold; font-size: 18px; } /* Custom Styles */ .rounded-border
+      { border-radius: 10px; background-color: black; color: white; padding:
+      40px;} .order-status { background-color: green; border-radius: 10px;
+      padding: 5px 10px; color: white; font-weight: bold; margin-top: 10px; }
+      .title { font-weight: bold; font-size: 24px; color: white;}
+    </style>
+  </head>
+  <body>
+    <div class='rounded-border'>
+      <h1 class='title'>Order Confirmation</h1>
+      <p>Order ID: {{orderId}}</p>
+      <p>Address: {{address}}</p>
+      <p>Order Status:
+        <span class='order-status'>{{orderStatus}}</span></p>
+
+      <p class='total-value'>Total Value: ${{totalValue}}</p>
+    </div>
+  </body>
+</html>
