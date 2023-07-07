@@ -80,6 +80,12 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    return queryInterface.dropTable('orders');
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_payment_type";',
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_order_status";',
+    );
+    return await queryInterface.dropTable('orders');
   },
 };

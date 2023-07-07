@@ -18,16 +18,16 @@ export class AddressesService {
     return this.addressModel.findAll({ where: { userId } });
   }
 
-  get(id: string): Promise<Address> {
-    return this.addressModel.findOne({ where: { id } });
+  get(id: string, userId: string): Promise<Address> {
+    return this.addressModel.findOne({ where: { id, userId } });
   }
 
-  async update(id: string, addressDto: AddressDto) {
-    await this.addressModel.update(addressDto, { where: { id } });
-    return this.addressModel.findOne({ where: { id } });
+  async update(id: string, userId: string, addressDto: AddressDto) {
+    await this.addressModel.update(addressDto, { where: { id, userId } });
+    return this.addressModel.findOne({ where: { id, userId } });
   }
 
-  delete(id: string): Promise<number> {
-    return this.addressModel.destroy({ where: { id } });
+  delete(id: string, userId: string): Promise<number> {
+    return this.addressModel.destroy({ where: { id, userId } });
   }
 }

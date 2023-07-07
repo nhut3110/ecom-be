@@ -60,14 +60,12 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    return queryInterface.sequelize.transaction(() => {
-      return Promise.all([
-        queryInterface.removeConstraint(
-          'order_details',
-          'order_detail_order_id_product_id',
-        ),
-        queryInterface.dropTable('order_details'),
-      ]);
+    return queryInterface.sequelize.transaction(async () => {
+      await queryInterface.removeConstraint(
+        'order_details',
+        'order_detail_order_id_product_id',
+      );
+      return await queryInterface.dropTable('order_details');
     });
   },
 };

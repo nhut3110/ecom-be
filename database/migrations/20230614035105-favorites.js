@@ -56,14 +56,12 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.sequelize.transaction(() => {
-      return Promise.all([
-        queryInterface.dropTable('favorites'),
-        queryInterface.removeConstraint(
-          'favorites',
-          'favorites_user_id_product_id',
-        ),
-      ]);
+    return queryInterface.sequelize.transaction(async () => {
+      await queryInterface.removeConstraint(
+        'favorites',
+        'favorites_user_id_product_id',
+      );
+      await queryInterface.dropTable('favorites');
     });
   },
 };

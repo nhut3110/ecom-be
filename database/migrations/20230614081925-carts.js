@@ -60,11 +60,9 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.sequelize.transaction(() => {
-      return Promise.all([
-        queryInterface.dropTable('carts'),
-        queryInterface.removeConstraint('carts', 'cart_user_id_product_id'),
-      ]);
+    return queryInterface.sequelize.transaction(async () => {
+      await queryInterface.removeConstraint('carts', 'cart_user_id_product_id');
+      await queryInterface.dropTable('carts');
     });
   },
 };

@@ -7,7 +7,6 @@ import {
   Param,
   Body,
   UseGuards,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { UserData } from 'src/decorators/user-data.decorator';
 import { AddressesService as AddressService } from './addresses.service';
@@ -17,7 +16,7 @@ import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 
 @Controller('addresses')
 export class AddressController {
-  constructor(private readonly addressesService: AddressService) {}
+  constructor(private readonly addressService: AddressService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -25,7 +24,7 @@ export class AddressController {
     @Body() addressDto: AddressDto,
     @UserData('id') userId: string,
   ): Promise<Address> {
-    return this.addressesService.create(userId, addressDto);
+    return this.addressService.create(userId, addressDto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -34,10 +33,7 @@ export class AddressController {
     @UserData('id') userId: string,
     @Param('id') id: string,
   ): Promise<Address> {
-    const address = await this.addressesService.get(id);
-
-    if (address.userId !== userId)
-      throw new UnauthorizedException('Invalid user');
+    const address = await this.addressService.get(id, userId);
 
     return address;
   }
@@ -45,7 +41,7 @@ export class AddressController {
   @UseGuards(JwtAuthGuard)
   @Get()
   getByUserId(@UserData('id') userId: string): Promise<Address[]> {
-    return this.addressesService.getListByUserId(userId);
+    return this.addressService.getListByUserId(userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -53,13 +49,17 @@ export class AddressController {
   update(
     @Param('id') id: string,
     @Body() addressDto: AddressDto,
+    @UserData('id') userId: string,
   ): Promise<Address> {
-    return this.addressesService.update(id, addressDto);
+    return this.addressService.update(id, userId, addressDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<number> {
-    return this.addressesService.delete(id);
+  delete(
+    @Param('id') id: string,
+    @UserData('id') userId: string,
+  ): Promise<number> {
+    return this.addressService.delete(id, userId);
   }
 }

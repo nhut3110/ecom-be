@@ -3,10 +3,10 @@ import {
   Get,
   Post,
   Patch,
-  Delete,
   Param,
   Body,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { OrderService } from './orders.service';
 import { OrderDto } from './dto/order.dto';
@@ -22,16 +22,19 @@ export class OrderController {
   @UseGuards(JwtAuthGuard)
   @Post()
   create(
-    @Body() orderData: OrderDto,
+    @Body(new ValidationPipe({ whitelist: true })) orderData: OrderDto,
     @UserData('id') userId: string,
   ): Promise<Order> {
-    return this.ordersService.create({ ...orderData, userId });
+    return this.ordersService.create(userId, orderData);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  getById(@Param('id') id: string): Promise<Order> {
-    return this.ordersService.getById(id);
+  getById(
+    @Param('id') id: string,
+    @UserData('id') userId: string,
+  ): Promise<Order> {
+    return this.ordersService.getById(id, userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -41,17 +44,11 @@ export class OrderController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id/status')
+  @Patch(':id/cancel')
   updateStatus(
     @Param('id') id: string,
-    @Body('status') status: OrderStatus,
+    @UserData('id') userId: string,
   ): Promise<Order> {
-    return this.ordersService.updateStatus(id, status);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  delete(@Param('id') id: string): Promise<boolean> {
-    return this.ordersService.delete(id);
+    return this.ordersService.cancel(id, userId, OrderStatus.CANCELED);
   }
 }

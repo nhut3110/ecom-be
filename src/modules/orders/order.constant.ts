@@ -9,7 +9,7 @@ export enum OrderStatus {
   'paid',
   'shipping',
   'completed',
-  'canceled',
+  CANCELED = 'canceled',
 }
 
 export const orderAttributes = [

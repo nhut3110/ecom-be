@@ -6,7 +6,7 @@ module.exports = {
     await queryInterface.sequelize.query(
       'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
     );
-    await queryInterface.createTable('payment', {
+    await queryInterface.createTable('payments', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -56,6 +56,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.dropTable('payment');
+    return queryInterface.dropTable('payments');
   },
 };

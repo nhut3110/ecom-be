@@ -29,16 +29,11 @@ export class PaymentController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async get(
+  get(
     @UserData('id') userId: string,
     @Param('id') id: string,
   ): Promise<Payment> {
-    const Payment = await this.paymentService.get(id);
-
-    if (Payment.userId !== userId)
-      throw new UnauthorizedException('Invalid user');
-
-    return Payment;
+    return this.paymentService.get(id, userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -49,7 +44,10 @@ export class PaymentController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<number> {
-    return this.paymentService.delete(id);
+  delete(
+    @Param('id') id: string,
+    @UserData('id') userId: string,
+  ): Promise<number> {
+    return this.paymentService.delete(id, userId);
   }
 }

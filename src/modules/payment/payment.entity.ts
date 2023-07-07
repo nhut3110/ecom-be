@@ -2,7 +2,7 @@ import { Column, DataType, ForeignKey, Table } from 'sequelize-typescript';
 import { User } from '../users/user.entity';
 import { TimestampBaseModel } from 'src/shared';
 
-@Table({ tableName: 'payment' })
+@Table({ tableName: 'payments' })
 export class Payment extends TimestampBaseModel<Payment> {
   @ForeignKey(() => User)
   @Column({

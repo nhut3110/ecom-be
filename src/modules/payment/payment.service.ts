@@ -21,14 +21,14 @@ export class PaymentService {
     });
   }
 
-  get(id: string): Promise<Payment> {
+  get(id: string, userId: string): Promise<Payment> {
     return this.paymentModel.findOne({
-      where: { id },
+      where: { id, userId },
       attributes: ['cardNumber', 'cardOwner', 'expiry', 'id'],
     });
   }
 
-  delete(id: string): Promise<number> {
-    return this.paymentModel.destroy({ where: { id } });
+  delete(id: string, userId: string): Promise<number> {
+    return this.paymentModel.destroy({ where: { id, userId } });
   }
 }

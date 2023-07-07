@@ -15,6 +15,7 @@ export class Address extends TimestampBaseModel<Address> {
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    field: 'customer_name',
   })
   name: string;
 

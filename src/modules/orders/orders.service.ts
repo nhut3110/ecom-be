@@ -1,15 +1,16 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Order } from './entities/order.entity';
-import { OrderDetailDto, OrderDto } from './dto/order.dto';
+import { OrderDto } from './dto/order.dto';
 import {
   OrderStatus,
-  PaymentTypes,
   orderAttributes,
   responseRelatedAttributes,
 } from './order.constant';
 import { CartService } from '../carts/carts.service';
 import { OrderDetail } from './entities/order-detail.entity';
+import { OrderDetails } from './order-detail.interface';
+import { Transaction } from 'sequelize';
 
 @Injectable()
 export class OrderService {
@@ -21,31 +22,50 @@ export class OrderService {
     private cartService: CartService,
   ) {}
 
-  async create(orderData: OrderDto): Promise<Order> {
-    const cartData = await this.cartService.get(orderData.userId);
+  async create(userId: string, orderData: OrderDto): Promise<Order> {
+    const cartData = await this.cartService.get(userId);
 
-    if (orderData.paymentType === PaymentTypes.CARD && !orderData.paymentId)
-      throw new BadRequestException('Lacking payment information');
+    if (!cartData.length) {
+      throw new BadRequestException(
+        'Cannot create an order with an empty cart',
+      );
+    }
 
-    const order = await this.orderModel.create(orderData);
+    const transaction: Transaction =
+      await this.orderModel.sequelize.transaction();
 
-    const orderDetails: OrderDetailDto[] = cartData.map((item) => {
-      return {
-        orderId: order.id,
-        productId: item.product.id,
-        quantity: item.quantity,
-      };
-    });
+    try {
+      const order = await this.orderModel.create(
+        { ...orderData, userId },
+        { transaction },
+      );
 
-    await this.orderDetailModel.bulkCreate(orderDetails);
-    await this.cartService.clear(orderData.userId);
+      const orderDetails: OrderDetails[] = cartData.map((item) => {
+        return {
+          orderId: order.id,
+          productId: item.product.id,
+          quantity: item.quantity,
+        };
+      });
 
-    return this.getById(order.id);
+      await this.orderDetailModel.bulkCreate(orderDetails, { transaction });
+
+      await this.cartService.clear(userId);
+
+      await transaction.commit();
+
+      return this.getById(order.id, userId);
+    } catch (error) {
+      if (transaction) {
+        await transaction.rollback();
+      }
+      throw error;
+    }
   }
 
-  getById(id: string): Promise<Order | null> {
+  getById(id: string, userId: string): Promise<Order | null> {
     return this.orderModel.findOne({
-      where: { id },
+      where: { id, userId },
       include: responseRelatedAttributes,
       attributes: orderAttributes,
     });
@@ -59,20 +79,18 @@ export class OrderService {
     });
   }
 
-  async updateStatus(id: string, status: OrderStatus): Promise<Order> {
+  async cancel(
+    id: string,
+    userId: string,
+    status: OrderStatus,
+  ): Promise<Order> {
     await this.orderModel.update(
       { orderStatus: status },
       {
-        where: { id },
+        where: { id, userId },
       },
     );
 
-    return this.getById(id);
-  }
-
-  async delete(id: string): Promise<boolean> {
-    return !!(await this.orderModel.destroy({
-      where: { id: id },
-    }));
+    return this.getById(id, userId);
   }
 }
