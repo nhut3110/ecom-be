@@ -17,6 +17,13 @@ import { FavoriteModule } from './modules/favorites/favorites.module';
 import { Favorite } from './modules/favorites/favorite.entity';
 import { CartModule } from './modules/carts/carts.module';
 import { Cart } from './modules/carts/cart.entity';
+import { AddressModule } from './modules/addresses/addresses.module';
+import { PaymentModule } from './modules/payment/payment.module';
+import { Address } from './modules/addresses/address.entity';
+import { Payment } from './modules/payment/payment.entity';
+import { OrderModule } from './modules/orders/orders.module';
+import { Order } from './modules/orders/entities/order.entity';
+import { OrderDetail } from './modules/orders/entities/order-detail.entity';
 
 @Module({
   imports: [
@@ -37,7 +44,17 @@ import { Cart } from './modules/carts/cart.entity';
           port: appConfigService.postgresPort,
           dialect: appConfigService.postgresDialect,
           autoLoadModels: true,
-          models: [User, Category, Product, Favorite, Cart],
+          models: [
+            User,
+            Category,
+            Product,
+            Favorite,
+            Cart,
+            Address,
+            Payment,
+            Order,
+            OrderDetail,
+          ],
         };
       },
       inject: [AppConfigService],
@@ -46,6 +63,9 @@ import { Cart } from './modules/carts/cart.entity';
     RedisModule,
     FavoriteModule,
     CartModule,
+    AddressModule,
+    PaymentModule,
+    OrderModule,
   ],
   providers: [CloudinaryService],
 })

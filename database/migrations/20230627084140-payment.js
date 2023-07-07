@@ -6,7 +6,7 @@ module.exports = {
     await queryInterface.sequelize.query(
       'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
     );
-    await queryInterface.createTable('favorites', {
+    await queryInterface.createTable('payments', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -24,44 +24,38 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      product_id: {
-        type: Sequelize.UUID,
+      card_number: {
+        type: Sequelize.STRING,
         allowNull: false,
-        references: {
-          model: 'products',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
-      createdAt: {
+      card_owner: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      cvc: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      expiry: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         field: 'created_at',
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         field: 'updated_at',
       },
     });
-
-    await queryInterface.addConstraint('favorites', {
-      fields: ['user_id', 'product_id'],
-      type: 'unique',
-      name: 'favorites_user_id_product_id',
-    });
   },
 
   async down(queryInterface) {
-    return queryInterface.sequelize.transaction(async () => {
-      await queryInterface.removeConstraint(
-        'favorites',
-        'favorites_user_id_product_id',
-      );
-      await queryInterface.dropTable('favorites');
-    });
+    return queryInterface.dropTable('payments');
   },
 };

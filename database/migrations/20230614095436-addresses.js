@@ -6,7 +6,7 @@ module.exports = {
     await queryInterface.sequelize.query(
       'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
     );
-    await queryInterface.createTable('favorites', {
+    await queryInterface.createTable('addresses', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -24,44 +24,46 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      product_id: {
-        type: Sequelize.UUID,
+      customer_name: {
+        type: Sequelize.STRING,
         allowNull: false,
-        references: {
-          model: 'products',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
-      createdAt: {
+      email: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      phone_number: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      lat: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      lng: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         field: 'created_at',
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         field: 'updated_at',
       },
     });
-
-    await queryInterface.addConstraint('favorites', {
-      fields: ['user_id', 'product_id'],
-      type: 'unique',
-      name: 'favorites_user_id_product_id',
-    });
   },
 
   async down(queryInterface) {
-    return queryInterface.sequelize.transaction(async () => {
-      await queryInterface.removeConstraint(
-        'favorites',
-        'favorites_user_id_product_id',
-      );
-      await queryInterface.dropTable('favorites');
-    });
+    return queryInterface.dropTable('addresses');
   },
 };

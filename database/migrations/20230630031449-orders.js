@@ -2,11 +2,11 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.query(
       'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
     );
-    await queryInterface.createTable('carts', {
+    await queryInterface.createTable('orders', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -24,45 +24,68 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      product_id: {
+      address_id: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'products',
+          model: 'addresses',
           key: 'id',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      quantity: {
-        type: Sequelize.INTEGER,
+      payment_type: {
+        type: Sequelize.ENUM('cash', 'card'),
         allowNull: false,
       },
-      createdAt: {
+      payment_id: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'payment',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      order_status: {
+        type: Sequelize.ENUM(
+          'pending',
+          'confirmed',
+          'paid',
+          'shipping',
+          'completed',
+          'canceled',
+        ),
+        allowNull: true,
+        defaultValue: 'pending',
+      },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         field: 'created_at',
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         field: 'updated_at',
       },
     });
-
-    await queryInterface.addConstraint('carts', {
-      fields: ['user_id', 'product_id'],
-      type: 'unique',
-      name: 'cart_user_id_product_id',
-    });
   },
 
-  async down(queryInterface) {
-    return queryInterface.sequelize.transaction(async () => {
-      await queryInterface.removeConstraint('carts', 'cart_user_id_product_id');
-      await queryInterface.dropTable('carts');
-    });
+  down: async (queryInterface) => {
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_payment_type";',
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_order_status";',
+    );
+    return await queryInterface.dropTable('orders');
   },
 };

@@ -2,11 +2,11 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.query(
       'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
     );
-    await queryInterface.createTable('favorites', {
+    await queryInterface.createTable('order_details', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -14,11 +14,11 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      user_id: {
+      order_id: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'users',
+          model: 'orders',
           key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -34,13 +34,17 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      createdAt: {
+      quantity: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         field: 'created_at',
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
@@ -48,20 +52,20 @@ module.exports = {
       },
     });
 
-    await queryInterface.addConstraint('favorites', {
-      fields: ['user_id', 'product_id'],
+    await queryInterface.addConstraint('order_details', {
+      fields: ['order_id', 'product_id'],
       type: 'unique',
-      name: 'favorites_user_id_product_id',
+      name: 'order_detail_order_id_product_id',
     });
   },
 
-  async down(queryInterface) {
+  down: async (queryInterface) => {
     return queryInterface.sequelize.transaction(async () => {
       await queryInterface.removeConstraint(
-        'favorites',
-        'favorites_user_id_product_id',
+        'order_details',
+        'order_detail_order_id_product_id',
       );
-      await queryInterface.dropTable('favorites');
+      return await queryInterface.dropTable('order_details');
     });
   },
 };
