@@ -4,7 +4,6 @@ import {
   IsUUID,
   IsEnum,
   ValidateIf,
-  ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PaymentTypes } from '../order.constant';

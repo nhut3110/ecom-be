@@ -1,3 +1,4 @@
+import { Transaction } from 'sequelize';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Order } from './entities/order.entity';
@@ -10,7 +11,7 @@ import {
 import { CartService } from '../carts/carts.service';
 import { OrderDetail } from './entities/order-detail.entity';
 import { OrderDetails } from './order-detail.interface';
-import { Transaction } from 'sequelize';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class OrderService {
@@ -20,6 +21,7 @@ export class OrderService {
     @InjectModel(OrderDetail)
     private orderDetailModel: typeof OrderDetail,
     private cartService: CartService,
+    private mailService: MailService,
   ) {}
 
   async create(userId: string, orderData: OrderDto): Promise<Order> {
@@ -92,5 +94,16 @@ export class OrderService {
     );
 
     return this.getById(id, userId);
+  }
+
+  async setComplete(id: string, userId: string) {
+    const order = await this.getById(id, userId);
+    if (order.orderStatus === OrderStatus.CANCELED)
+      throw new BadRequestException('Order canceled');
+
+    order.orderStatus = OrderStatus.COMPLETED;
+    await order.save();
+
+    return await this.mailService.sendOrderMail(order.address.email, order);
   }
 }

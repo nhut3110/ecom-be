@@ -24,6 +24,8 @@ import { Payment } from './modules/payment/payment.entity';
 import { OrderModule } from './modules/orders/orders.module';
 import { Order } from './modules/orders/entities/order.entity';
 import { OrderDetail } from './modules/orders/entities/order-detail.entity';
+import { MailModule } from './modules/mail/mail.module';
+import { OtpModule } from './modules/otp/otp.module';
 
 @Module({
   imports: [
@@ -66,6 +68,8 @@ import { OrderDetail } from './modules/orders/entities/order-detail.entity';
     AddressModule,
     PaymentModule,
     OrderModule,
+    MailModule,
+    OtpModule,
   ],
   providers: [CloudinaryService],
 })

@@ -10,10 +10,10 @@ import {
 } from '@nestjs/common';
 import { OrderService } from './orders.service';
 import { OrderDto } from './dto/order.dto';
-import { Order } from './entities/order.entity';
 import { OrderStatus } from './order.constant';
 import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { UserData } from 'src/decorators/user-data.decorator';
+import { Order } from './entities/order.entity';
 
 @Controller('orders')
 export class OrderController {
@@ -50,5 +50,14 @@ export class OrderController {
     @UserData('id') userId: string,
   ): Promise<Order> {
     return this.ordersService.cancel(id, userId, OrderStatus.CANCELED);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/complete')
+  updateComplete(
+    @Param('id') id: string,
+    @UserData('id') userId: string,
+  ): Promise<boolean> {
+    return this.ordersService.setComplete(id, userId);
   }
 }

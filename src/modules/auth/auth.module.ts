@@ -8,6 +8,7 @@ import { AppConfigService } from 'src/modules/config/app-config.service';
 import { AppConfigModule } from 'src/modules/config/app-config.module';
 import { TokensModule } from '../tokens/tokens.module';
 import { RedisModule } from 'src/modules/redis/redis.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   controllers: [AuthController],
@@ -17,6 +18,7 @@ import { RedisModule } from 'src/modules/redis/redis.module';
     AppConfigModule,
     TokensModule,
     RedisModule,
+    MailModule,
   ],
   providers: [AuthService, JwtStrategy, AppConfigService],
   exports: [AuthService],

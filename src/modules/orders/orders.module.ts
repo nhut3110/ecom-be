@@ -9,13 +9,18 @@ import { Payment } from '../payment/payment.entity';
 import { CartModule } from '../carts/carts.module';
 import { CartService } from '../carts/carts.service';
 import { OrderDetail } from './entities/order-detail.entity';
+import { MailModule } from '../mail/mail.module';
+import { MailService } from '../mail/mail.service';
+import { AppConfigModule } from '../config/app-config.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([Order, Cart, Address, Payment, OrderDetail]),
     CartModule,
+    MailModule,
+    AppConfigModule,
   ],
   controllers: [OrderController],
-  providers: [OrderService, CartService],
+  providers: [OrderService, CartService, MailService],
 })
 export class OrderModule {}
