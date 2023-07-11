@@ -41,4 +41,29 @@ export class RedisService {
     const zRemAsync = promisify(this.client.zRem).bind(this.client);
     return zRemAsync(key, member);
   }
+
+  get(key: string): Promise<string | null> {
+    const getAsync = promisify(this.client.get).bind(this.client);
+    return getAsync(key);
+  }
+
+  set(key: string, value: string): Promise<string> {
+    const setAsync = promisify(this.client.set).bind(this.client);
+    return setAsync(key, value);
+  }
+
+  del(key: string): Promise<number> {
+    const delAsync = promisify(this.client.del).bind(this.client);
+    return delAsync(key);
+  }
+
+  expireAt(key: string, timestamp: number | Date) {
+    const expireAtAsync = promisify(this.client.expireAt).bind(this.client);
+    return expireAtAsync(key, timestamp);
+  }
+
+  ttl(key: string) {
+    const ttlAsync = promisify(this.client.ttl).bind(this.client);
+    return ttlAsync(key);
+  }
 }

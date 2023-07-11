@@ -9,6 +9,7 @@ export const enum JwtTokenTypes {
 }
 
 export const TOKEN_PREFIX = 'tokens';
+export const OTP_PREFIX = 'otp';
 
 export const REDIS_TOKEN = 'REDIS';
 

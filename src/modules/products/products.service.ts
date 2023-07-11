@@ -19,6 +19,10 @@ export class ProductService {
     return this.productModel.create(product);
   }
 
+  bulkCreate(products: CreateProductDto[]): Promise<Product[]> {
+    return this.productModel.bulkCreate(products);
+  }
+
   findAll(): Promise<Product[]> {
     return this.productModel.findAll();
   }

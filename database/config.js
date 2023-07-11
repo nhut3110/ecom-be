@@ -5,8 +5,8 @@ module.exports = {
     host: 'localhost',
     port: 5432,
     username: 'postgres',
-    password: 'postgres',
-    database: 'database',
+    password: 'vmnvmn3110',
+    database: 'postgres',
   },
   test: {
     migrationStorageTableName: 'Migrations',

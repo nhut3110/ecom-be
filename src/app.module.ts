@@ -24,6 +24,10 @@ import { Payment } from './modules/payment/payment.entity';
 import { OrderModule } from './modules/orders/orders.module';
 import { Order } from './modules/orders/entities/order.entity';
 import { OrderDetail } from './modules/orders/entities/order-detail.entity';
+import { MailModule } from './modules/mail/mail.module';
+import { OtpModule } from './modules/otp/otp.module';
+import { ProductAdditionalImagesModule } from './modules/product_additional_images/product_additional_images.module';
+import { ProductAdditionalImage } from './modules/product_additional_images/product_additional_image.entity';
 
 @Module({
   imports: [
@@ -54,6 +58,7 @@ import { OrderDetail } from './modules/orders/entities/order-detail.entity';
             Payment,
             Order,
             OrderDetail,
+            ProductAdditionalImage,
           ],
         };
       },
@@ -66,6 +71,9 @@ import { OrderDetail } from './modules/orders/entities/order-detail.entity';
     AddressModule,
     PaymentModule,
     OrderModule,
+    MailModule,
+    OtpModule,
+    ProductAdditionalImagesModule,
   ],
   providers: [CloudinaryService],
 })

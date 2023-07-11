@@ -88,4 +88,28 @@ export class AppConfigService {
   get redisUrl(): string {
     return this.configService.get<string>('redis.url');
   }
+
+  get googleClientId(): string {
+    return this.configService.get<string>('google.client-id');
+  }
+
+  get googleClientSecret(): string {
+    return this.configService.get<string>('google.client-secret');
+  }
+
+  get googleToken(): string {
+    return this.configService.get<string>('google.token');
+  }
+
+  get googleOauth2CallbackUrl(): string {
+    return this.configService.get<string>('google.oauth2-callback-url');
+  }
+
+  get otpTTL(): string {
+    return this.configService.get<string>('otp.ttl');
+  }
+
+  get otpRefreshTime(): string {
+    return this.configService.get<string>('otp.refresh-otp-time');
+  }
 }

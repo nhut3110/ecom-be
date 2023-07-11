@@ -30,6 +30,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      thumbnail_url: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       category_id: {
         type: Sequelize.UUID,
         allowNull: false,
@@ -46,6 +50,56 @@ module.exports = {
       },
       count: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      set_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      number_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: '',
+      },
+      pieces: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      year: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1975,
+      },
+      instructions_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      minifigs: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      height: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      depth: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      width: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      weight: {
+        type: Sequelize.FLOAT,
         allowNull: false,
         defaultValue: 0,
       },
