@@ -28,6 +28,10 @@ import { MailModule } from './modules/mail/mail.module';
 import { OtpModule } from './modules/otp/otp.module';
 import { ProductAdditionalImagesModule } from './modules/product_additional_images/product_additional_images.module';
 import { ProductAdditionalImage } from './modules/product_additional_images/product_additional_image.entity';
+import { ProxyModule } from './proxy/proxy.module';
+import { ProxyService } from './proxy/proxy.service';
+import { ProxyController } from './proxy/proxy.controller';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -74,7 +78,10 @@ import { ProductAdditionalImage } from './modules/product_additional_images/prod
     MailModule,
     OtpModule,
     ProductAdditionalImagesModule,
+    ProxyModule,
+    HttpModule,
   ],
-  providers: [CloudinaryService],
+  providers: [CloudinaryService, ProxyService],
+  controllers: [ProxyController],
 })
 export class AppModule {}
