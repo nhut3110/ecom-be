@@ -30,7 +30,17 @@ export class CartService {
     return this.cartModel.findAll({
       where: { userId },
       include: [
-        { model: Product, attributes: ['id', 'title', 'image', 'price'] },
+        {
+          model: Product,
+          attributes: [
+            'id',
+            'title',
+            'image',
+            'price',
+            'availableQuantity',
+            'discountPercentage',
+          ],
+        },
       ],
       attributes: ['quantity'],
     });

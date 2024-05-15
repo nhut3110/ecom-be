@@ -12,8 +12,9 @@ import { Payment } from '../../payment/payment.entity';
 import { TimestampBaseModel } from 'src/shared';
 import { OrderStatus } from '../order.constant';
 import { OrderDetail } from './order-detail.entity';
+import { UserDiscount } from 'src/modules/discounts/user_discount.entity';
 
-@Table({ tableName: 'orders' })
+@Table({ tableName: 'orders', timestamps: false })
 export class Order extends TimestampBaseModel<Order> {
   @ForeignKey(() => User)
   @Column({
@@ -46,7 +47,7 @@ export class Order extends TimestampBaseModel<Order> {
   payment: Payment;
 
   @Column({
-    type: DataType.ENUM('cash', 'card'),
+    type: DataType.ENUM('cash', 'vnpay'),
     allowNull: false,
     field: 'payment_type',
   })
@@ -57,6 +58,12 @@ export class Order extends TimestampBaseModel<Order> {
     allowNull: true,
   })
   description: string;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  amount: number;
 
   @Column({
     type: DataType.ENUM(
@@ -72,6 +79,17 @@ export class Order extends TimestampBaseModel<Order> {
     field: 'order_status',
   })
   orderStatus: OrderStatus;
+
+  @ForeignKey(() => UserDiscount)
+  @Column({
+    type: DataType.UUID,
+    field: 'discount_id',
+    allowNull: true,
+  })
+  discountId: string;
+
+  @BelongsTo(() => UserDiscount)
+  discount: UserDiscount;
 
   @HasMany(() => OrderDetail)
   orderDetails: OrderDetail[];

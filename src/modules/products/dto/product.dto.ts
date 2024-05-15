@@ -104,6 +104,47 @@ export class ProductDto {
 
   @IsNumber()
   @Min(0)
+  @ApiProperty({ example: 20.0 })
+  discountPercentage: number;
+
+  @IsNumber()
+  @Min(0)
+  @ApiProperty({ example: 200 })
+  availableQuantity: number;
+
+  @IsNumber()
+  @Min(0)
   @ApiProperty({ example: 1.2 })
   weight: number;
+
+  @IsNumber()
+  @Min(0)
+  @ApiProperty({ example: 1.2 })
+  ageRange: number;
+
+  @IsNumber()
+  @Min(0)
+  @ApiProperty({ example: 1.2 })
+  additionalImageCount: number;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    example: 'This is a description of the product.',
+  })
+  barcode?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    example: 'This is a description of the product.',
+  })
+  packagingType?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    example: 'This is a description of the product.',
+  })
+  availability?: string;
 }

@@ -103,6 +103,41 @@ module.exports = {
         allowNull: false,
         defaultValue: 0,
       },
+      discount_percentage: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+        defaultValue: 0,
+      },
+      available_quantity: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      age_range: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
+      barcode: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: '',
+      },
+      additional_image_count: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
+      packaging_type: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: '',
+      },
+      availability: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: '',
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

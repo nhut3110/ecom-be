@@ -12,15 +12,43 @@ import { OrderDetail } from './entities/order-detail.entity';
 import { MailModule } from '../mail/mail.module';
 import { MailService } from '../mail/mail.service';
 import { AppConfigModule } from '../config/app-config.module';
+import { Discount } from '../discounts/discount.entity';
+import { Product } from '../products/product.entity';
+import { DiscountService } from '../discounts/discounts.service';
+import { ProductService } from '../products/products.service';
+import { DiscountModule } from '../discounts/discounts.module';
+import { ProductModule } from '../products/products.module';
+import { UserDiscount } from '../discounts/user_discount.entity';
+import { AppConfigService } from '../config/app-config.service';
+import { User } from '../users/user.entity';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Order, Cart, Address, Payment, OrderDetail]),
+    SequelizeModule.forFeature([
+      Order,
+      Cart,
+      Address,
+      Payment,
+      OrderDetail,
+      Discount,
+      Product,
+      UserDiscount,
+      User,
+    ]),
     CartModule,
     MailModule,
+    DiscountModule,
+    ProductModule,
     AppConfigModule,
   ],
   controllers: [OrderController],
-  providers: [OrderService, CartService, MailService],
+  providers: [
+    OrderService,
+    CartService,
+    MailService,
+    DiscountService,
+    ProductService,
+    AppConfigService,
+  ],
 })
 export class OrderModule {}

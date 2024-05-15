@@ -4,6 +4,8 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './category.entity';
 import { IdDto } from '../users/dto/id.dto';
+import { Sequelize } from 'sequelize';
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -44,5 +46,22 @@ export class CategoriesService {
 
   remove(id: IdDto): Promise<number> {
     return this.categoryModel.destroy({ where: { id: id } });
+  }
+
+  async findAllWithProductCount(): Promise<Category[]> {
+    return this.categoryModel.findAll({
+      include: [
+        {
+          model: Product,
+          attributes: [],
+        },
+      ],
+      attributes: {
+        include: [
+          [Sequelize.fn('COUNT', Sequelize.col('products.id')), 'productCount'],
+        ],
+      },
+      group: ['Category.id'],
+    });
   }
 }

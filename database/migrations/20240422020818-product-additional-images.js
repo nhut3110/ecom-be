@@ -49,7 +49,7 @@ module.exports = {
 
   down: async (queryInterface) => {
     return queryInterface.sequelize.transaction(() => {
-      return queryInterface.dropTable('products');
+      return queryInterface.dropTable('product_additional_images');
     });
   },
 };

@@ -8,6 +8,8 @@ import {
   BadRequestException,
   UseGuards,
   Headers,
+  Get,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -22,6 +24,7 @@ import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { TokensService } from '../tokens/tokens.service';
 import { UserData } from 'src/decorators/user-data.decorator';
 import { Response } from 'src/shared';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -98,5 +101,22 @@ export class AuthController {
     } catch (err) {
       throw new UnauthorizedException('Wrong credentials');
     }
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {
+    // This guard will handle the redirect to Google
+  }
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req, @Res() res) {
+    // Handle callback from Google, this is usually automatically handled by the Google strategy
+    const { tokens } = req.user;
+    // Redirect user back to the front-end with the tokens (you might use query params or hash fragments depending on your front-end handling)
+    return res.redirect(
+      `http://localhost:5173/google?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`,
+    );
   }
 }

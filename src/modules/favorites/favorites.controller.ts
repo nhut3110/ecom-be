@@ -22,6 +22,15 @@ export class FavoriteController {
   constructor(private readonly favoriteService: FavoriteService) {}
 
   @UseGuards(JwtAuthGuard)
+  @Get('check/:productId')
+  checkFavoriteProduct(
+    @UserData('id') userId: string,
+    @Param('productId') productId: string,
+  ): Promise<boolean> {
+    return this.favoriteService.checkIsFavorite(userId, productId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get()
   findMany(
     @UserData('id') userId: string,

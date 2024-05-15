@@ -31,6 +31,20 @@ export class Product extends TimestampBaseModel<Product> {
   @Column({ type: DataType.STRING, allowNull: false, field: 'thumbnail_url' })
   thumbnailUrl: string;
 
+  @Column({
+    type: DataType.FLOAT,
+    allowNull: false,
+    field: 'discount_percentage',
+  })
+  discountPercentage: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    field: 'available_quantity',
+  })
+  availableQuantity: number;
+
   @Column({ type: DataType.FLOAT, allowNull: true })
   rate: number;
 
@@ -81,6 +95,40 @@ export class Product extends TimestampBaseModel<Product> {
 
   @Column({ type: DataType.FLOAT, allowNull: false, defaultValue: 0 })
   weight: number;
+
+  @Column({ type: DataType.INTEGER, allowNull: false, field: 'age_range' })
+  ageRange: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    field: 'additional_image_count',
+  })
+  additionalImageCount: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    defaultValue: '',
+    field: 'barcode',
+  })
+  barcode: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    defaultValue: '',
+    field: 'packaging_type',
+  })
+  packagingType: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    defaultValue: '',
+    field: 'availability',
+  })
+  availability: string;
 
   @HasMany(() => ProductAdditionalImage)
   additionalImages: ProductAdditionalImage[];

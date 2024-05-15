@@ -85,6 +85,10 @@ export class AppConfigService {
     return this.configService.get<string>('redis.host');
   }
 
+  get redisPassword(): string {
+    return this.configService.get<string>('redis.password');
+  }
+
   get redisUrl(): string {
     return this.configService.get<string>('redis.url');
   }
@@ -105,11 +109,35 @@ export class AppConfigService {
     return this.configService.get<string>('google.oauth2-callback-url');
   }
 
+  get googleLoginCallbackUrl(): string {
+    return this.configService.get<string>('google.login-callback-url');
+  }
+
   get otpTTL(): string {
     return this.configService.get<string>('otp.ttl');
   }
 
   get otpRefreshTime(): string {
     return this.configService.get<string>('otp.refresh-otp-time');
+  }
+
+  get vnpayTmnCode(): string {
+    return this.configService.get<string>('vnpay.vnp_TmnCode');
+  }
+
+  get vnpayHashSecret(): string {
+    return this.configService.get<string>('vnpay.vnp_HashSecret');
+  }
+
+  get vnpayUrl(): string {
+    return this.configService.get<string>('vnpay.vnp_Url');
+  }
+
+  get vnpayReturnUrl(): string {
+    return this.configService.get<string>('vnpay.vnp_ReturnUrl');
+  }
+
+  get shippingPointRatio(): number {
+    return this.configService.get<number>('shipping-point-ratio');
   }
 }

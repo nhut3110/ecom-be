@@ -62,4 +62,11 @@ export const configValidationSchema = Joi.object({
     ttl: timeSpanExtension.timeSpan().required(),
     'refresh-otp-time': timeSpanExtension.timeSpan().required(),
   }),
+
+  vnpay: Joi.object({
+    vnp_TmnCode: Joi.string().required(),
+    vnp_HashSecret: Joi.string().required(),
+    vnp_Url: Joi.string().required(),
+    vnp_ReturnUrl: Joi.string().required(),
+  }),
 });

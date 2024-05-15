@@ -9,9 +9,9 @@ module.exports = {
     await queryInterface.createTable('orders', {
       id: {
         type: Sequelize.UUID,
-        primaryKey: true,
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         allowNull: false,
+        primaryKey: true,
         unique: true,
       },
       user_id: {
@@ -35,7 +35,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       payment_type: {
-        type: Sequelize.ENUM('cash', 'card'),
+        type: Sequelize.ENUM('cash', 'vnpay'),
         allowNull: false,
       },
       payment_id: {
@@ -63,6 +63,20 @@ module.exports = {
       description: {
         type: Sequelize.TEXT,
         allowNull: true,
+      },
+      // discount_id: {
+      //   type: Sequelize.UUID,
+      //   allowNull: true,
+      //   references: {
+      //     model: 'user_discounts',
+      //     key: 'id',
+      //   },
+      //   onUpdate: 'CASCADE',
+      //   onDelete: 'CASCADE',
+      // },
+      amount: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
       created_at: {
         type: Sequelize.DATE,

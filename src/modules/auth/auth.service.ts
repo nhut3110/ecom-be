@@ -74,6 +74,10 @@ export class AuthService {
     return await this.usersService.createUser({
       ...user,
       password: await this.hashPassword(user.password),
+      provider: AccountTypes.LOCAL,
+      picture:
+        user.picture ??
+        'http://res.cloudinary.com/dzd6xmzvv/image/upload/v1715654552/crbfwcvhcgmd2cu3lhsc.png',
     });
   }
 
@@ -118,7 +122,7 @@ export class AuthService {
         name: data.name,
         password: '',
         picture: data.picture.data.url,
-        provider: 'facebook',
+        provider: 'third_party',
       });
 
       return this.tokensService.getTokens(createdUserResponse.id);
@@ -153,5 +157,21 @@ export class AuthService {
     return {
       message: 'Change password successfully',
     };
+  }
+
+  async validateGoogleOAuthUser(user: any): Promise<any> {
+    console.log(user);
+    let foundUser = await this.usersService.findOneByEmail(user.email);
+    if (!foundUser) {
+      foundUser = await this.usersService.createUser({
+        ...user,
+        password: '',
+        provider: 'third_party',
+      });
+    }
+
+    const tokens = await this.tokensService.getTokens(foundUser.id);
+
+    return { tokens };
   }
 }

@@ -7,7 +7,17 @@ import { Product } from './product.entity';
 import { IdDto } from '../users/dto/id.dto';
 import { FindManyProductDto } from './dto/find-many.dto';
 import { PaginateResult } from '../../shared/interfaces/paginate.interface';
-import { SortDirection } from 'src/shared';
+
+interface QueryFilters {
+  title?: { [Op.iLike]: string };
+  price?: {
+    [Op.between]?: [number, number];
+    [Op.gte]?: number;
+    [Op.lte]?: number;
+  };
+  year?: number;
+  [key: string]: any; // Additional properties if necessary
+}
 
 @Injectable()
 export class ProductService {
@@ -55,29 +65,115 @@ export class ProductService {
   async findMany(
     filterOptions: FindManyProductDto,
   ): Promise<PaginateResult<Product>> {
-    const { sortBy, sortDirection, title, cursor, limit, ...filters } =
-      filterOptions;
+    const {
+      sortBy,
+      sortDirection,
+      title,
+      cursor,
+      limit,
+      minPrice,
+      maxPrice,
+      year,
+      exceptedProducts,
+      ...additionalFilters
+    } = filterOptions;
 
-    const cursorOperator = sortDirection === SortDirection.ASC ? Op.gt : Op.lt;
+    const exclusionFilter = exceptedProducts?.length
+      ? { id: { [Op.notIn]: exceptedProducts } }
+      : {};
+
+    const filters: QueryFilters = {
+      ...additionalFilters,
+      ...(title && { title: { [Op.iLike]: `%${title}%` } }),
+      ...(year && { year }),
+    };
+
+    if (minPrice !== undefined && maxPrice !== undefined) {
+      filters.price = { [Op.between]: [minPrice, maxPrice] };
+    } else {
+      if (minPrice !== undefined)
+        filters.price = { ...(filters.price || {}), [Op.gte]: minPrice };
+      if (maxPrice !== undefined)
+        filters.price = { ...(filters.price || {}), [Op.lte]: maxPrice };
+    }
 
     const { rows, count } = await this.productModel.findAndCountAll({
       where: {
-        title: {
-          [Op.iLike]: `%${title}%`,
-        },
         ...filters,
-        ...(cursor && { [sortBy]: { [cursorOperator]: cursor } }),
+        ...exclusionFilter,
+        ...(cursor && { [sortBy]: { [Op.gt]: cursor } }),
       },
       order: [[sortBy, sortDirection]],
-      limit: limit,
+      limit,
     });
 
     return {
       data: rows,
       pagination: {
         total: count,
-        nextCursor: rows[rows.length - 1]?.[sortBy],
+        nextCursor: rows.length > 0 ? rows[rows.length - 1][sortBy] : null,
       },
     };
+  }
+
+  async count(filterOptions: FindManyProductDto): Promise<number> {
+    const {
+      sortBy,
+      sortDirection,
+      title,
+      categoryId,
+      year,
+      minPrice,
+      maxPrice,
+      ...filters
+    } = filterOptions;
+
+    return this.productModel.count({
+      where: {
+        ...(title && { title: { [Op.iLike]: `%${title}%` } }),
+        ...(categoryId && { categoryId }),
+        ...(year && { year }),
+        ...(minPrice !== undefined &&
+          maxPrice !== undefined && {
+            price: { [Op.between]: [minPrice, maxPrice] },
+          }),
+        ...filters,
+      },
+    });
+  }
+
+  async clearRatings(): Promise<void> {
+    await this.productModel.update({ rate: 0 }, { where: {} });
+  }
+
+  async updatePricesToVND(): Promise<number> {
+    const exchangeRate = 25500; // USD to VND exchange rate
+    const minUSDPrice = 10000;
+
+    // Fetch products that need conversion
+    const productsToUpdate = await this.productModel.findAll({
+      where: {
+        price: { [Op.lte]: minUSDPrice },
+      },
+    });
+
+    const updatedProducts = productsToUpdate.map((product) => {
+      const roundedUSDPrice = Math.round(product.price);
+      const priceInVND = roundedUSDPrice * exchangeRate;
+      return { id: product.id, price: priceInVND };
+    });
+
+    // Update products with new prices in VND
+    const updatePromises = updatedProducts.map((product) =>
+      this.productModel.update(
+        { price: product.price },
+        { where: { id: product.id } },
+      ),
+    );
+
+    await Promise.all(updatePromises);
+
+    // Return the number of products updated
+    return updatedProducts.length;
   }
 }

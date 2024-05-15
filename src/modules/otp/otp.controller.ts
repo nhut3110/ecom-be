@@ -50,7 +50,7 @@ export class OtpController {
       type,
     });
 
-    if (!isValidOtp) throw new UnauthorizedException('Invalid OTP');
+    if (!isValidOtp) throw new BadRequestException('Invalid OTP');
 
     await this.otpService.revokeOtp(email, type);
 

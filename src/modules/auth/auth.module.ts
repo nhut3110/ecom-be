@@ -9,6 +9,7 @@ import { AppConfigModule } from 'src/modules/config/app-config.module';
 import { TokensModule } from '../tokens/tokens.module';
 import { RedisModule } from 'src/modules/redis/redis.module';
 import { MailModule } from '../mail/mail.module';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -20,7 +21,7 @@ import { MailModule } from '../mail/mail.module';
     RedisModule,
     MailModule,
   ],
-  providers: [AuthService, JwtStrategy, AppConfigService],
+  providers: [AuthService, JwtStrategy, AppConfigService, GoogleStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

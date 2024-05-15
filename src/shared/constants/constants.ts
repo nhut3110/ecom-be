@@ -1,6 +1,6 @@
 export const enum AccountTypes {
-  FACEBOOK = 'facebook',
   LOCAL = 'local',
+  THIRD_PARTY = 'third_party',
 }
 
 export const enum JwtTokenTypes {

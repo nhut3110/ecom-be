@@ -14,8 +14,13 @@ import { REDIS_TOKEN } from 'src/shared';
       provide: REDIS_TOKEN,
       useFactory: async (appConfigService: AppConfigService) => {
         const client = Redis.createClient({
-          url: appConfigService.redisUrl,
+          // url: appConfigService.redisUrl,
           legacyMode: true,
+          password: appConfigService.redisPassword,
+          socket: {
+            host: appConfigService.redisHost,
+            port: appConfigService.redisPort,
+          },
         });
         await client.connect();
         return client;

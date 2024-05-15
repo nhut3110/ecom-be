@@ -40,7 +40,7 @@ module.exports = {
       },
       provider: {
         type: Sequelize.ENUM,
-        values: ['local', 'facebook'],
+        values: ['local', 'third_party'],
         defaultValue: 'local',
       },
       created_at: {

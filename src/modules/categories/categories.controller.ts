@@ -29,6 +29,11 @@ export class CategoriesController {
     return this.categoriesService.createBulk(createCategoryDto);
   }
 
+  @Get('/count-product')
+  findAllWithProductCount(): Promise<Category[]> {
+    return this.categoriesService.findAllWithProductCount();
+  }
+
   @Get()
   findAll(): Promise<Category[]> {
     return this.categoriesService.findAll();

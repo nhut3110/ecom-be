@@ -9,7 +9,7 @@ import { TimestampBaseModel } from 'src/shared';
 import { Order } from './order.entity';
 import { Product } from 'src/modules/products/product.entity';
 
-@Table({ tableName: 'order_details' })
+@Table({ tableName: 'order_details', timestamps: false })
 export class OrderDetail extends TimestampBaseModel<OrderDetail> {
   @ForeignKey(() => Order)
   @Column({ type: DataType.UUID, field: 'order_id', allowNull: false })

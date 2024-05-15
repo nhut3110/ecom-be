@@ -1,6 +1,7 @@
 import { Exclude } from 'class-transformer';
-import { Table, Column, DataType, Scopes } from 'sequelize-typescript';
+import { Table, Column, DataType, Scopes, HasMany } from 'sequelize-typescript';
 import { TimestampBaseModel } from 'src/shared/entities/timestamp.entity';
+import { UserDiscount } from '../discounts/user_discount.entity';
 
 @Scopes(() => ({
   withoutPassword: {
@@ -51,8 +52,11 @@ export class User extends TimestampBaseModel<User> {
 
   @Column({
     type: DataType.ENUM,
-    values: ['local', 'facebook'],
+    values: ['local', 'third_party'],
     defaultValue: 'local',
   })
   provider: string;
+
+  @HasMany(() => UserDiscount)
+  userDiscounts: UserDiscount[];
 }

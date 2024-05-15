@@ -1,4 +1,4 @@
-import { IsString, IsUUID, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsUUID, IsEnum, IsOptional, IsArray } from 'class-validator';
 import { BaseFindManyDto } from 'src/shared';
 
 export class FindManyFavoriteDto extends BaseFindManyDto {
@@ -10,6 +10,10 @@ export class FindManyFavoriteDto extends BaseFindManyDto {
   @IsUUID()
   @IsOptional()
   categoryId: string;
+
+  @IsUUID()
+  @IsOptional()
+  productId: string;
 
   @IsString()
   @IsOptional()

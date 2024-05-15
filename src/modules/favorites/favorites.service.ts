@@ -35,6 +35,10 @@ export class FavoritesService {
     return this.favoriteModel.destroy({ where: { userId, productId } });
   }
 
+  async checkIsFavorite(userId: string, productId: string): Promise<boolean> {
+    return !!(await this.favoriteModel.count({ where: { userId, productId } }));
+  }
+
   async findProductList(
     userId: string,
     filterOptions: FindManyFavoriteDto,

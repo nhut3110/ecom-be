@@ -21,7 +21,7 @@ export class MailService {
     );
 
     oauth2Client.setCredentials({
-      refresh_token: this.appConfigService.googleToken,
+      refresh_token: this.appConfigService.googleToken.replace(/\\n/g, '\n'),
     });
 
     const accessToken: string = await new Promise((resolve, reject) => {
@@ -35,11 +35,15 @@ export class MailService {
 
     const config: Options = {
       service: 'gmail',
+      host: 'smtp.gmail.com',
       auth: {
         type: 'OAuth2',
-        user: 'noreply.fakestore@gmail.com',
-        clientId: this.appConfigService.googleClientId,
-        clientSecret: this.appConfigService.googleClientSecret,
+        user: 'legood.noreply@gmail.com',
+        clientId: this.appConfigService.googleClientId.replace(/\\n/g, '\n'),
+        clientSecret: this.appConfigService.googleClientSecret.replace(
+          /\\n/g,
+          '\n',
+        ),
         accessToken,
       },
     };
@@ -48,22 +52,15 @@ export class MailService {
 
   public async sendOTPMail(email: string, code: string): Promise<boolean> {
     await this.setTransport();
-    return this.mailerService
-      .sendMail({
-        transporterName: 'gmail',
-        to: email,
-        subject: 'Verification Code - Fake Store',
-        template: './otp',
-        context: {
-          code: code,
-        },
-      })
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
+    return this.mailerService.sendMail({
+      transporterName: 'gmail',
+      to: email,
+      subject: 'Verification Code - Legood Store',
+      template: './otp',
+      context: {
+        code: code,
+      },
+    });
   }
 
   public async sendOrderMail(email: string, order: Order): Promise<boolean> {
@@ -72,16 +69,14 @@ export class MailService {
       .sendMail({
         transporterName: 'gmail',
         to: email,
-        subject: `Order #${order.id} - Fake Store`,
+        subject: `Order #${order.id} - Legood Store`,
         template: './order',
         context: {
           orderId: order.id,
           address: order.address.address,
           orderStatus: order.orderStatus,
-          totalValue: order.orderDetails.reduce(
-            (total, item) => total + item.product.price * item.quantity,
-            0,
-          ),
+          totalValue: order.amount,
+          products: order.orderDetails,
         },
       })
       .then(() => {

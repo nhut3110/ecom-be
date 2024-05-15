@@ -13,7 +13,6 @@ export class UsersService {
     private readonly userModel: typeof User,
     private readonly cloudinary: CloudinaryService,
   ) {}
-
   getUsers(): Promise<User[]> {
     return this.userModel.scope('withoutPassword').findAll();
   }
