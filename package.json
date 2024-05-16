@@ -11,7 +11,7 @@
     "start:dev": "cross-env NODE_ENV=dev nest start --watch",
     "start:test": "cross-env NODE_ENV=test nest start --watch",
     "start:debug": "cross-env NODE_ENV=dev nest start --debug --watch",
-    "start:prod": "cross-env NODE_ENV=prod node dist/main",
+    "start:prod": "cross-env NODE_ENV=dev node --max-old-space-size=2048 dist/main",
     "migrate:up": " npx sequelize-cli db:migrate --env dev",
     "migrate:down": "npx sequelize-cli db:migrate:undo --env dev",
     "migrate:create": "npx sequelize-cli migration:generate --name",

@@ -58,7 +58,7 @@ export class AppConfigService {
   }
 
   get postgresPort(): number {
-    return this.configService.get<number>('postgres.post');
+    return this.configService.get<number>('postgres.port');
   }
 
   get postgresDialect(): any {

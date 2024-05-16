@@ -44,13 +44,4 @@ p/S/jxYk9y7E881tC14F4hvWbqSGrDOw48ObOKACub9EG3Uvug==
       },
     },
   },
-  test: {
-    migrationStorageTableName: 'Migrations',
-    dialect: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'postgres',
-    database: 'test',
-  },
 };
