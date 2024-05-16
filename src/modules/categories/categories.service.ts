@@ -61,7 +61,12 @@ export class CategoriesService {
           [Sequelize.fn('COUNT', Sequelize.col('products.id')), 'productCount'],
         ],
       },
-      group: ['Category.id'],
+      group: [
+        'Category.id',
+        'Category.created_at',
+        'Category.updated_at',
+        'Category.name',
+      ],
     });
   }
 }
