@@ -1,21 +1,59 @@
 port: 3000
-client: 'http://localhost:5173'
+client: https://legood.netlify.app
+salt: 10
+shipping-point-ratio: 1000
 
 jwt:
-  secret-key:
-  access-token-expire-in:
-  refresh-token-expire-in:
+  secret-key: hehe
+  access-token-expire-in: 1h
+  refresh-token-expire-in: 3d
 
 facebook:
-  client-id:
-  client-secret:
-  callback-url:
-  graph-url:
+  client-id: 1213240936224087
+  client-secret: c5eb7ba9c91525de7e980e1d15786555
+  graph-url: https://graph.facebook.com
 
 postgres:
-  username:
-  password:
-  name:
-  host:
-  port:
-  dialect:
+  # username: postgres
+  # password: vmnvmn3110
+  # name: postgres
+  # host: localhost
+  # port: 5432
+  # dialect: postgres
+  username: avnadmin
+  password: AVNS_1XOiD_iiYcLpRm1bjao
+  name: defaultdb
+  host: pg-20a86af4-vominhnhut31102002-9e04.g.aivencloud.com
+  port: 14057
+  dialect: postgres
+
+cloudinary:
+  cloud-name: dzd6xmzvv
+  api-key: 156269933569375
+  api-secret: 3f_Nhoy9S7uk_sJuUQyYBD0pGkQ
+  # cloud-name: duikuu56w
+  # api-key: 694441961717553
+  # api-secret: H37EYdWLdHUXDjYG3evHG7Cjsgo
+
+redis:
+  url: redis://default:13YqrkJe2PbAThForPTZ7w2mKx1vA37T@redis-15477.c252.ap-southeast-1-1.ec2.redns.redis-cloud.com:15477 # redis://127.0.0.1:6379
+  host: redis-15477.c252.ap-southeast-1-1.ec2.redns.redis-cloud.com #127.0.0.1
+  port: 15477 #6379
+  password: 13YqrkJe2PbAThForPTZ7w2mKx1vA37T
+
+google:
+  client-id: 188427128930-n3br1oja7t42odjqqftbtol1qfsv6b9a.apps.googleusercontent.com
+  client-secret: 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
+  token: 1//043dhn7onyypiCgYIARAAGAQSNwF-L9IrjywhLAs5_g_0Ow5JB0KzdhuWMYO_2kGltdSLZ07tMS8ly0XnzFP2pWDyBXWIMOYqBNw
+  oauth2-callback-url: https://developers.google.com/oauthplayground
+  login-callback-url: https://favourite-willy-legood-c4aa8bf9.koyeb.app/auth/google/redirect
+
+otp:
+  ttl: 5m
+  refresh-otp-time: 3m
+
+vnpay:
+  vnp_TmnCode: FYDCQII1
+  vnp_HashSecret: NGUQEOOJ8IEYXOMOFXYT2Z6OELRYPVU1
+  vnp_Url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  vnp_ReturnUrl: https://legood.netlify.app/get-payment-data

@@ -25,12 +25,14 @@ import { TokensService } from '../tokens/tokens.service';
 import { UserData } from 'src/decorators/user-data.decorator';
 import { Response } from 'src/shared';
 import { AuthGuard } from '@nestjs/passport';
+import { AppConfigService } from '../config/app-config.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly tokensService: TokensService,
+    private readonly appConfigService: AppConfigService,
   ) {}
 
   @Post('register')
@@ -116,7 +118,7 @@ export class AuthController {
     const { tokens } = req.user;
     // Redirect user back to the front-end with the tokens (you might use query params or hash fragments depending on your front-end handling)
     return res.redirect(
-      `http://localhost:5173/google?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`,
+      `${this.appConfigService.client}/google?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`,
     );
   }
 }

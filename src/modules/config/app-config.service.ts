@@ -9,6 +9,10 @@ export class AppConfigService {
     return this.configService.get<number>('port');
   }
 
+  get client(): number {
+    return this.configService.get<number>('client');
+  }
+
   get salt(): number {
     return this.configService.get<number>('salt');
   }
