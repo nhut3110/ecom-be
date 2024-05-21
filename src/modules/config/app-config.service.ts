@@ -17,6 +17,10 @@ export class AppConfigService {
     return this.configService.get<number>('salt');
   }
 
+  get cacheTtl(): number {
+    return this.configService.get<number>('cache.ttl');
+  }
+
   get rateLimit(): number {
     return this.configService.get<number>('rate.limit');
   }

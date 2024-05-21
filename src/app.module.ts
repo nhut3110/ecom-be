@@ -47,13 +47,10 @@ import {
 import { DiscussionModule } from './modules/discussions/discussions.module';
 import { Discussion } from './modules/discussions/discussion.entity';
 import { AppController } from './app.controller';
-import {
-  ThrottlerGuard,
-  ThrottlerModule,
-  seconds,
-} from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule, seconds } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -139,6 +136,13 @@ p/S/jxYk9y7E881tC14F4hvWbqSGrDOw48ObOKACub9EG3Uvug==
       },
       inject: [AppConfigService],
     }),
+    CacheModule.registerAsync({
+      imports: [AppConfigModule],
+      useFactory: async (appConfigService: AppConfigService) => ({
+        ttl: appConfigService.cacheTtl,
+      }),
+      inject: [AppConfigService],
+    }),
     TokensModule,
     RedisModule,
     FavoriteModule,
@@ -162,6 +166,10 @@ p/S/jxYk9y7E881tC14F4hvWbqSGrDOw48ObOKACub9EG3Uvug==
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
     },
   ],
   controllers: [ProxyController, AppController],

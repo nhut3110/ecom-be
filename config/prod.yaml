@@ -3,6 +3,9 @@ client: https://legood.netlify.app
 salt: 10
 shipping-point-ratio: 1000
 
+cache:
+  ttl: 20000
+
 rate:
   ttl-in-seconds: 10
   limit: 5
