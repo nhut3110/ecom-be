@@ -1,4 +1,10 @@
 {
   "files.eol": "\n",
-  "cSpell.words": ["Cloudinary", "resave", "vnpay"]
+  "cSpell.words": [
+    "Cloudinary",
+    "resave",
+    "vnpay"
+  ],
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true
 }

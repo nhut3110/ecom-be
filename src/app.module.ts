@@ -46,6 +46,7 @@ import {
 } from './modules/comments/comment.entity';
 import { DiscussionModule } from './modules/discussions/discussions.module';
 import { Discussion } from './modules/discussions/discussion.entity';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -138,6 +139,6 @@ p/S/jxYk9y7E881tC14F4hvWbqSGrDOw48ObOKACub9EG3Uvug==
     DiscussionModule,
   ],
   providers: [CloudinaryService, ProxyService],
-  controllers: [ProxyController],
+  controllers: [ProxyController, AppController],
 })
 export class AppModule {}
