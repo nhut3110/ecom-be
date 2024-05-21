@@ -3,6 +3,10 @@ client: http://localhost:5173
 salt: 10
 shipping-point-ratio: 1000
 
+rate:
+  ttl-in-seconds: 1
+  limit: 10
+
 jwt:
   secret-key: hehe
   access-token-expire-in: 1h

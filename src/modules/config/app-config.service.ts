@@ -17,6 +17,14 @@ export class AppConfigService {
     return this.configService.get<number>('salt');
   }
 
+  get rateLimit(): number {
+    return this.configService.get<number>('rate.limit');
+  }
+
+  get rateTtl(): number {
+    return this.configService.get<number>('rate.ttl-in-seconds');
+  }
+
   get jwtSecretKey(): string {
     return this.configService.get<string>('jwt.secret-key');
   }

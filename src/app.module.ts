@@ -47,6 +47,14 @@ import {
 import { DiscussionModule } from './modules/discussions/discussions.module';
 import { Discussion } from './modules/discussions/discussion.entity';
 import { AppController } from './app.controller';
+import {
+  ThrottlerGuard,
+  ThrottlerModule,
+  minutes,
+  seconds,
+} from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -56,6 +64,17 @@ import { AppController } from './app.controller';
     CloudinaryModule,
     ProductModule,
     CategoriesModule,
+    ThrottlerModule.forRootAsync({
+      imports: [AppConfigModule],
+      inject: [AppConfigService],
+      useFactory: (appConfigService: AppConfigService) => [
+        {
+          ttl: minutes(appConfigService.rateTtl),
+          limit: appConfigService.rateLimit,
+          storage: new ThrottlerStorageRedisService(appConfigService.redisUrl),
+        },
+      ],
+    }),
     SequelizeModule.forRootAsync({
       imports: [AppConfigModule],
       useFactory: async (appConfigService: AppConfigService) => {
@@ -138,7 +157,14 @@ p/S/jxYk9y7E881tC14F4hvWbqSGrDOw48ObOKACub9EG3Uvug==
     CommentsModule,
     DiscussionModule,
   ],
-  providers: [CloudinaryService, ProxyService],
+  providers: [
+    CloudinaryService,
+    ProxyService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
   controllers: [ProxyController, AppController],
 })
 export class AppModule {}
