@@ -5,7 +5,7 @@ shipping-point-ratio: 1000
 
 rate:
   ttl-in-seconds: 1
-  limit: 10
+  limit: 100
 
 jwt:
   secret-key: hehe

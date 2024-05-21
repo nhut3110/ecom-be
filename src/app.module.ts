@@ -50,7 +50,6 @@ import { AppController } from './app.controller';
 import {
   ThrottlerGuard,
   ThrottlerModule,
-  minutes,
   seconds,
 } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
@@ -69,7 +68,7 @@ import { APP_GUARD } from '@nestjs/core';
       inject: [AppConfigService],
       useFactory: (appConfigService: AppConfigService) => [
         {
-          ttl: minutes(appConfigService.rateTtl),
+          ttl: seconds(appConfigService.rateTtl),
           limit: appConfigService.rateLimit,
           storage: new ThrottlerStorageRedisService(appConfigService.redisUrl),
         },
