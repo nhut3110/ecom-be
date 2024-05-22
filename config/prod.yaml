@@ -53,7 +53,7 @@ google:
   client-secret: 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
   token: 1//043dhn7onyypiCgYIARAAGAQSNwF-L9IrjywhLAs5_g_0Ow5JB0KzdhuWMYO_2kGltdSLZ07tMS8ly0XnzFP2pWDyBXWIMOYqBNw
   oauth2-callback-url: https://developers.google.com/oauthplayground
-  login-callback-url: http://legood.sytes.net/auth/google/redirect
+  login-callback-url: https://legood.sytes.net/auth/google/redirect
 
 otp:
   ttl: 5m

@@ -16,6 +16,7 @@ import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { User } from './user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserData } from 'src/decorators/user-data.decorator';
+import { Throttle, seconds } from '@nestjs/throttler';
 
 @Controller('users')
 export class UsersController {
@@ -42,6 +43,7 @@ export class UsersController {
     return user;
   }
 
+  @Throttle({ default: { limit: 1, ttl: seconds(1) } })
   @Patch('me')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -52,6 +54,7 @@ export class UsersController {
     return this.usersService.updateById(userId, updateData);
   }
 
+  @Throttle({ default: { limit: 1, ttl: seconds(1) } })
   @Patch('me/avatar')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)

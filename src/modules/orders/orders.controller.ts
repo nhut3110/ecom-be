@@ -16,11 +16,13 @@ import { JwtAuthGuard } from 'src/middleware/guards/jwt-auth.guard';
 import { UserData } from 'src/decorators/user-data.decorator';
 import { Order } from './entities/order.entity';
 import { ReturnQueryFromVNPay } from 'vnpay';
+import { Throttle, seconds } from '@nestjs/throttler';
 
 @Controller('orders')
 export class OrderController {
   constructor(private readonly ordersService: OrderService) {}
 
+  @Throttle({ default: { limit: 1, ttl: seconds(1) } })
   @UseGuards(JwtAuthGuard)
   @Post(':id/payment-url')
   async generatePaymentUrl(
@@ -42,6 +44,7 @@ export class OrderController {
     return { paymentUrl };
   }
 
+  @Throttle({ default: { limit: 1, ttl: seconds(1) } })
   @UseGuards(JwtAuthGuard)
   @Post()
   create(

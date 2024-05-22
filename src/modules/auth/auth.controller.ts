@@ -26,6 +26,7 @@ import { UserData } from 'src/decorators/user-data.decorator';
 import { Response } from 'src/shared';
 import { AuthGuard } from '@nestjs/passport';
 import { AppConfigService } from '../config/app-config.service';
+import { Throttle, seconds } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -43,6 +44,7 @@ export class AuthController {
     return createdUser;
   }
 
+  @Throttle({ default: { limit: 1, ttl: seconds(1) } })
   @Post('login')
   login(@Body() loginDetail: LoginDto): Promise<Tokens> {
     const { email, password } = loginDetail;
